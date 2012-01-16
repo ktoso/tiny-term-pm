@@ -1,0 +1,11 @@
+target
+project/target
+*.class
+*.jar
+
+*~
+*.tmp
+
+*.iml
+.idea
+.sbt_completion_cache
