@@ -6,7 +6,10 @@ object Resolvers {
   val myResolvers = Seq(
     ScalaToolsSnapshots,
     "Sonatype releases" at "http://oss.sonatype.org/content/repositories/releases/",
-    "SpyMemcached repository" at "http://files.couchbase.com/maven2/")
+    "SpyMemcached repository" at "http://files.couchbase.com/maven2/",
+    "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
+    "JLine Project Repository</name>" at "http://jline.sourceforge.net/m2repo"
+  )
 }
 
 object BuildSettings {
@@ -31,6 +34,17 @@ object Dependencies {
   val apacheCommonsLogging  = "commons-logging"       %   "commons-logging"       % "1.1.1"
   val apacheCommonsNet      = "commons-net"           %   "commons-net"           % "3.0.1"
 
+  val scalaDispatch         = "net.databinder"       %% "dispatch-http"           % "0.8.7"
+  val scalajCollection      = "org.scalaj"           %% "scalaj-collection"       % "1.2"
+
+  val jLine                 = "jline"                 % "jline"                   % "0.9.9"
+
+  val akkaVersion = "1.3-RC6"
+  val akkaActor             = "se.scalablesolutions.akka" % "akka-actor"         % akkaVersion
+  val akkaTypedActor        = "se.scalablesolutions.akka" % "akka-typed-actor"   % akkaVersion
+  val akkaTestKit           = "se.scalablesolutions.akka" % "akka-testkit"       % akkaVersion
+  val akkaAll               = Seq(akkaActor, akkaTypedActor, akkaTestKit)
+
   val guava                 = "com.google.guava"      %   "guava"                 % "11.0"
 
   val scalatest             = "org.scalatest"         %%  "scalatest"             % "1.6.1"
@@ -47,9 +61,9 @@ object EpgDataManagerBuild extends Build {
     "tiny-term-pm",
     file("."),
     settings = buildSettings ++
-      Seq(libraryDependencies ++= Seq() ++ testing ) ++
+      Seq(libraryDependencies ++= Seq(scalaDispatch, scalajCollection, jLine) ++ akkaAll ++ testing ) ++
       Seq(
-        mainClass in (Compile, packageBin)    := Some("pl.project13.tinytermpm.Runner"),
+        mainClass in (Compile, packageBin) := Some("pl.project13.tinytermpm.Runner"),
         version := "0.1"
       )
 
