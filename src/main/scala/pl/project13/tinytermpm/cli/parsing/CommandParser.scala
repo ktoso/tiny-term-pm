@@ -2,6 +2,7 @@ package pl.project13.tinytermpm.cli.parsing
 
 import command._
 import util.parsing.combinator.JavaTokenParsers
+import scala.Predef._
 
 class CommandParser extends JavaTokenParsers {
 
@@ -9,23 +10,35 @@ class CommandParser extends JavaTokenParsers {
     """\d+""".r ^^ { n => n.toInt }
   
   def tasks: Parser[ApiCommand] = ("tasks") ^^ {
-    tasks => TasksCommand()
+    case tasks => TasksCommand()
   }
 
-  def users: Parser[ApiCommand] = ("users") ^^ {
-    tasks => UsersCommand()
+  def help: Parser[ApiCommand] = ("help" | "h") ^^ {
+    help => HelpCommand()
+  }
+
+  def users: Parser[ApiCommand] = "users" ^^ {
+    case users => UsersCommand()
+  }
+
+  def projects: Parser[ApiCommand] = "projects" ^^ {
+    case p => ProjectsCommand()
+  }
+
+  def projectDetails: Parser[ApiCommand] = "project" ~> positiveNumber ^^ {
+    case id => ProjectsCommand(Some(id))
   }
 
   def stories: Parser[ApiCommand] = ("s" | "stories") ^^ {
-    tasks => StoriesCommand()
+    case tasks => StoriesCommand()
   }
   
   def exit: Parser[ApiCommand] = ("wq" | "q" | "exit" | "quit") ^^ {
-    exit => ExitCommand()
+    case exit => ExitCommand()
   }
   
-  def iam: Parser[ApiCommand] = ("i am" | "self") ~> positiveNumber ^^ {
-    id => SetSelfIdCommand(id) 
+  def iam: Parser[ApiCommand] = ("i am " | "self ") ~> positiveNumber ^^ {
+    case id => SetSelfIdCommand(id)
   }
 
   def create: Parser[ApiCommand] = ("c" | "create") ~ opt(createWhat) ^^ {
@@ -36,6 +49,8 @@ class CommandParser extends JavaTokenParsers {
         case None => CreateCommand()
       }
   }
+  
+  def nothing: Parser[ApiCommand] = "" ^^ { case it => NoOpCommand() }
 
   def createWhat: Parser[String] = "task" | "story"
   
@@ -46,13 +61,17 @@ class CommandParser extends JavaTokenParsers {
   | create 
   | iam
   | exit
+  | projects
+  | projectDetails
+  | help
+  | nothing
   )
 }
 object CommandParser extends CommandParser {
-  def parse(protoContent: String): ApiCommand = {
-    parseAll(command, protoContent) match {
-      case Success(res, _) => res.asInstanceOf[ApiCommand]
-      case x: Failure => UnknownCommand()
+  def parse(content: String): ApiCommand = {
+    parseAll(command, content) match {
+      case Success(res: ApiCommand, _) => res
+      case x: Failure => UnknownCommand(content)
       case x: Error => throw new RuntimeException(x.toString)
     }
   }

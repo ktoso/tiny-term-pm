@@ -14,4 +14,7 @@ class Project {
   var code: String = null
   @BeanProperty
   var name: String = null
+  
+  override def toString =
+    "%d [code: %s] - %s".format(id, code, name)
 }

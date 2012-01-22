@@ -37,6 +37,7 @@ object Dependencies {
   val scalaDispatch         = "net.databinder"       %% "dispatch-http"           % "0.8.7"
   val scalajCollection      = "org.scalaj"           %% "scalaj-collection"       % "1.2"
 
+  val scalaToolsTime        = "org.scala-tools.time" %% "time"                    % "0.5"
   val jLine                 = "jline"                 % "jline"                   % "0.9.9"
 
   val akkaVersion = "1.3-RC6"
@@ -61,7 +62,10 @@ object EpgDataManagerBuild extends Build {
     "tiny-term-pm",
     file("."),
     settings = buildSettings ++
-      Seq(libraryDependencies ++= Seq(scalaDispatch, scalajCollection, jLine) ++ akkaAll ++ testing ) ++
+      Seq(libraryDependencies ++=
+            Seq(scalaDispatch, scalajCollection, jLine, scalaToolsTime) ++
+            akkaAll ++
+            testing ) ++
       Seq(
         mainClass in (Compile, packageBin) := Some("pl.project13.tinytermpm.Runner"),
         version := "0.1"

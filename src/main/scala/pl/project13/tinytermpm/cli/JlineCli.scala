@@ -5,11 +5,11 @@ import jline.{CandidateListCompletionHandler, ConsoleReader}
 
 
 trait Cli {
-  def tel(message: String)
-  def tell(message: String)
-  def warn(message: String)
-  def shell(message: String): String
-  def askFor(message: String): String
+  def tel(message: Any)
+  def tell(message: Any)
+  def warn(message: Any)
+  def shell(): String
+  def askFor(message: Any): String
 }
 
 class JlineCli extends Cli {
@@ -20,24 +20,24 @@ class JlineCli extends Cli {
   reader.setCompletionHandler(new CandidateListCompletionHandler());
   reader.addCompletor(new CommandsCompletor)
 
-  def shell(message: String) = {
+  def shell() = {
     reader.readLine()
   }
 
-  def askFor(message: String) = {
+  def askFor(message: Any) = {
     Console.print(message + " ")
     Console.readLine()
   }
 
-  def tel(message: String) {
+  def tel(message: Any) {
     Console.print(message)
   }
 
-  def tell(message: String) {
+  def tell(message: Any) {
     Console.println(message)
   }
 
-  def warn(message: String) {
+  def warn(message: Any) {
     Console.println(message)
   }
 }

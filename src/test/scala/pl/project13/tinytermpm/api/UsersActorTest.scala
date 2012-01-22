@@ -1,5 +1,6 @@
 package pl.project13.tinytermpm.api
 
+import actor.UsersActor
 import org.scalatest.{FlatSpec, FunSuite}
 import org.scalatest.matchers.ShouldMatchers
 import akka.testkit.TestKit

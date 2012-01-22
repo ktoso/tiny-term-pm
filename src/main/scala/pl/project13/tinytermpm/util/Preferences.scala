@@ -3,8 +3,9 @@ package pl.project13.tinytermpm.util
 import Constants._
 import PathConversions._
 import Using._
-import java.util.Properties
 import java.io.{FileOutputStream, FileInputStream}
+import pl.project13.tinytermpm.api.model.Project
+import java.util.Properties
 
 trait ApiPreferences {
   def ServerUrl: String
@@ -25,6 +26,12 @@ object Preferences extends Preferences {
   def areDefined = PreferencesFile.exists()
   def areNotDefined = !areDefined
 
+  private def saveProps(props: Properties) {
+    using(new FileOutputStream(PreferencesFile)) { fos =>
+      props.store(fos, "TinyTermPM preferences - "+Version)
+    }
+  }
+
   def saveUserDetails(id: Int, name: String = "") {
     val props = new Properties
         
@@ -34,9 +41,22 @@ object Preferences extends Preferences {
     props.put("user.id", id.toString)
     props.put("user.name", name)
 
-    using(new FileOutputStream(PreferencesFile)) { fos =>
-      props.store(fos, "TinyTermPM preferences - "+Version)
-    }
+    saveProps(props)
+  }
+  
+  def saveProject(project: Project) {
+    val props = new Properties
+
+    props.put("server.url", ServerUrl)
+    props.put("api.key", ApiKey)
+
+    props.put("user.id", UserId.toString)
+    props.put("user.name", UserName)
+
+    props.put("project.id", project.id.toString)
+    props.put("project.name", project.name)
+
+    saveProps(props)
   }
   
   def save(serverUrl: String, apiKey: String) {
@@ -45,9 +65,7 @@ object Preferences extends Preferences {
     props.put("server.url", serverUrl)
     props.put("api.key", apiKey)
 
-    using(new FileOutputStream(PreferencesFile)) { fos =>
-      props.store(fos, "TinyTermPM preferences - "+Version)
-    }
+    saveProps(props)
   }
   
   def props = {
@@ -64,4 +82,7 @@ object Preferences extends Preferences {
   // look like a constant ;-)
   def UserName = props.getProperty("user.name", "Anonymous") 
   def UserId = props.getProperty("user.id").toInt
+
+  def ProjectId = props.getProperty("project.id", "")
+  def ProjectName = props.getProperty("project.name", "")
 }

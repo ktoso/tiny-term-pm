@@ -1,6 +1,7 @@
 package pl.project13.tinytermpm
 
 import cli.{JlineCli, Cli}
+import cli.util.AnsiCodes._
 import util.{Constants, Preferences}
 
 class Runner(cli: Cli) {
@@ -35,10 +36,12 @@ object Runner {
     tell(Constants.AsciiArtAppName)
     tell(Constants.AuthorHeadline)
 
-    tell("Hello, "+Preferences.UserName+". How's going?")
+    tell(green("Hello, "+Preferences.UserName+". How's going?"))
+    tell("Your default project is: "+b(Preferences.ProjectName))
 
     (new Runner(cli)).init()
 
     tell("Happy hakking!")
+    tell("")
   }
 }
