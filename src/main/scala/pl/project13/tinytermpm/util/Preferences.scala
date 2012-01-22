@@ -41,6 +41,9 @@ object Preferences extends Preferences {
     props.put("user.id", id.toString)
     props.put("user.name", name)
 
+    props.put("project.id", ProjectId)
+    props.put("project.name", ProjectName)
+
     saveProps(props)
   }
   
