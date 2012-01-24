@@ -2,7 +2,7 @@ package pl.project13.tinytermpm.util
 
 import Constants._
 import PathConversions._
-import Using._
+import verb.Using._
 import pl.project13.tinytermpm.api.model.Project
 import java.util.Properties
 import java.io.{FileNotFoundException, FileOutputStream, FileInputStream}
@@ -14,11 +14,15 @@ trait ApiPreferences {
   def apiUrl(path: String) = ServerUrl/path+"?token="+ApiKey
 }
 
-trait UserPreferences
+trait HarvestPreferences {
+  def HarvestServerUrl: String
+  def HarvestUsername: String
+  def HarvestPassword: String
+}
 
 trait Preferences
-  extends UserPreferences
-  with ApiPreferences
+  extends ApiPreferences
+  with HarvestPreferences
 
 object Preferences extends Preferences {
   val Version = "v0.1"
@@ -26,69 +30,74 @@ object Preferences extends Preferences {
   def areDefined = PreferencesFile.exists()
   def areNotDefined = !areDefined
 
-  private def saveProps(props: Properties) {
-    using(new FileOutputStream(PreferencesFile)) { fos =>
-      props.store(fos, "TinyTermPM preferences - "+Version)
-    }
-  }
+  def saveHarvestDetails(url: String, username: String, password: String) {
+    val props = loadProps
 
-  def saveUserDetails(id: Int, name: String = "") {
-    val props = new Properties
-        
-    props.put("server.url", ServerUrl)
-    props.put("api.key", ApiKey)
-    
-    props.put("user.id", id.toString)
-    props.put("user.name", name)
+    props.put("harvest.server.url", url)
+    props.put("harvest.username", username)
+    props.put("harvest.password", password)
 
-    props.put("project.id", ProjectId)
-    props.put("project.name", ProjectName)
+    println("props = " + props)
 
     saveProps(props)
   }
   
+  def saveUserDetails(id: Int, name: String = "") {
+    val props = loadProps
+    
+    props.put("user.id", id.toString)
+    props.put("user.name", name)
+
+    saveProps(props)
+  }
+
   def saveProject(project: Project) {
-    val props = new Properties
-
-    props.put("server.url", ServerUrl)
-    props.put("api.key", ApiKey)
-
-    props.put("user.id", UserId.toString)
-    props.put("user.name", UserName)
+    val props = loadProps
 
     props.put("project.id", project.id.toString)
     props.put("project.name", project.name)
 
     saveProps(props)
   }
-  
+
   def save(serverUrl: String, apiKey: String) {
-    val props = new Properties
+    val props = loadProps
     
     props.put("server.url", serverUrl)
     props.put("api.key", apiKey)
 
     saveProps(props)
   }
+
+  private def saveProps(props: Properties) {
+    using(new FileOutputStream(PreferencesFile)) { fos =>
+      props.store(fos, "TinyTermPM preferences - "+Version)
+    }
+  }
   
-  def props = {
+  def loadProps = {
     val properties = new Properties
 
-    try {
-    using (new FileInputStream(PreferencesFile)) { fis =>
-      properties.load(fis)
+    try { using (new FileInputStream(PreferencesFile)) {
+      properties.load(_)
+    }} catch {
+      case _ : FileNotFoundException => //System.err.println("No existing tiny-term-pm config file found...")
     }
-    } catch { case _:FileNotFoundException => System.err.println("No existing tiny-term-pm config file found...") }
+
     properties
   }
 
-  lazy val ServerUrl = props.getProperty("server.url")
-  lazy val ApiKey = props.getProperty("api.key")
-  
-  // look like a constant ;-)
-  def UserName = props.getProperty("user.name", "Anonymous") 
-  def UserId = props.getProperty("user.id").toInt
+  lazy val ServerUrl = loadProps.getProperty("server.url")
+  lazy val ApiKey = loadProps.getProperty("api.key")
 
-  def ProjectId = props.getProperty("project.id", "")
-  def ProjectName = props.getProperty("project.name", "")
+  lazy val HarvestServerUrl = loadProps.getProperty("harvest.server.url")
+  lazy val HarvestUsername = loadProps.getProperty("harvest.username")
+  lazy val HarvestPassword = loadProps.getProperty("harvest.password")
+
+  // look like a constant ;-)
+  def UserName = loadProps.getProperty("user.name", "Anonymous")
+  def UserId = loadProps.getProperty("user.id").toInt
+
+  def ProjectId = loadProps.getProperty("project.id", "") // todo should be a number?
+  def ProjectName = loadProps.getProperty("project.name", "")
 }

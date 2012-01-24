@@ -11,8 +11,10 @@ class Runner(cli: Cli) {
   val repl = new Repl(cli)
 
   def init() {
-    if (Preferences.areNotDefined)
+    if (Preferences.areNotDefined) {
       firstStartQuiz()
+      harvestQuiz()
+    }
 
     repl.start()
   }
@@ -25,6 +27,29 @@ class Runner(cli: Cli) {
     tel("Saving settings... ")
     Preferences.save(serverUrl = url, apiKey = apiKey)
     tell("Done!")
+  }
+
+  def harvestQuiz() {
+    var undecided = true
+    while(undecided) {
+      val yn = askFor("Do you want to bind your Harvest account into TinyTermPm? [y/n]")
+      
+      yn match {
+        case "y" =>
+          undecided = false
+
+          val url = askFor("""Harvest server url ("http://project13.harvestapp.com"):""")
+          val user = askFor("Harvest username:")
+          val pass = askFor("Harvest password:")
+
+          tel("Saving harvest settings... ")
+          Preferences.saveHarvestDetails(url, user, pass)
+          tell("Done!")
+
+        case "n" => undecided = false
+        case _ => undecided = true
+      }
+    }
   }
 }
 
