@@ -3,9 +3,9 @@ package pl.project13.tinytermpm.util
 import Constants._
 import PathConversions._
 import Using._
-import java.io.{FileOutputStream, FileInputStream}
 import pl.project13.tinytermpm.api.model.Project
 import java.util.Properties
+import java.io.{FileNotFoundException, FileOutputStream, FileInputStream}
 
 trait ApiPreferences {
   def ServerUrl: String
@@ -73,9 +73,12 @@ object Preferences extends Preferences {
   
   def props = {
     val properties = new Properties
+
+    try {
     using (new FileInputStream(PreferencesFile)) { fis =>
       properties.load(fis)
     }
+    } catch { case _:FileNotFoundException => System.err.println("No existing tiny-term-pm config file found...") }
     properties
   }
 
