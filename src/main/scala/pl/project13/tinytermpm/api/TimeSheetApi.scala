@@ -12,5 +12,7 @@ trait TimeSheetApi {
   def forTask(taskId: Long,
               userId: Option[Long] = None): List[Activity]
 
-  def create(taskId: Long, activity: Activity)
+  def create(taskId: Long, activity: Activity) // fire and forget
+
+  def delete(taskId: Long, activity: Activity) // fire and forget
 }
