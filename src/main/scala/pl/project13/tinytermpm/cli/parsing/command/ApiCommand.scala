@@ -1,4 +1,25 @@
 package pl.project13.tinytermpm.cli.parsing.command
 
-abstract class ApiCommand
+sealed abstract class ApiCommand
+
 case class NoOpCommand() extends ApiCommand
+
+case class ProjectsCommand(projectId: Option[Long] = None) extends ApiCommand
+
+case class TasksCommand() extends ApiCommand
+
+case class UnknownCommand(input: String) extends ApiCommand
+
+case class SetSelfIdCommand(id: Int) extends ApiCommand
+
+case class UsersCommand() extends ApiCommand
+
+case class StoriesCommand(id: Option[Long] = None) extends ApiCommand
+
+case class CreateCommand() extends ApiCommand
+case class CreateTaskCommand() extends CreateCommand
+case class CreateStoryCommand() extends CreateCommand
+
+case class ExitCommand() extends ApiCommand
+
+case class HelpCommand() extends ApiCommand

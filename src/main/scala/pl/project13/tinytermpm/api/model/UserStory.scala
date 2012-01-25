@@ -20,6 +20,5 @@ class UserStory {
 
   @XmlElementWrapper(name = "tags")
   @XmlElement(name = "tag")
-  @BeanProperty
   var tags: List[String] = new ArrayList[String]
 }

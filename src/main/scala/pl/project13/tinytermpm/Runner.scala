@@ -1,7 +1,7 @@
 package pl.project13.tinytermpm
 
 import cli.{JlineCli, Cli}
-import cli.util.AnsiCodes._
+import cli.util.ColorizedStrings._
 import util.{Constants, Preferences}
 
 class Runner(cli: Cli) {

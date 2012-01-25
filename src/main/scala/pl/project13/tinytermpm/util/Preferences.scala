@@ -98,6 +98,6 @@ object Preferences extends Preferences {
   def UserName = loadProps.getProperty("user.name", "Anonymous")
   def UserId = loadProps.getProperty("user.id").toInt
 
-  def ProjectId = loadProps.getProperty("project.id", "") // todo should be a number?
+  def ProjectId = loadProps.getProperty("project.id", "0").toLong
   def ProjectName = loadProps.getProperty("project.name", "")
 }

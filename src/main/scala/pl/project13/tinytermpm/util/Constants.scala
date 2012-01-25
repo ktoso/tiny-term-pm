@@ -2,7 +2,7 @@ package pl.project13.tinytermpm.util
 
 import java.io.File
 import PathConversions._
-import pl.project13.tinytermpm.cli.util.AnsiCodes._
+import pl.project13.tinytermpm.cli.util.ColorizedStrings._
 
 object Constants {
 
@@ -19,7 +19,8 @@ object Constants {
       |_|  |_|_| |_|\__, |_|\___|_|  |_| |_| |_|_|    |_|  |_|
                      __/ |
                     |___/
-"""
+""".green
+
   val AuthorHeadline = """
    Konrad Malawski <konrad.malawski@java.pl>    project13.pl
    https://github.com/ktoso/tiny-term-pm        License: GPLv3

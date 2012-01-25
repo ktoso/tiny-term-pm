@@ -3,10 +3,11 @@ package pl.project13.tinytermpm.cli.parsing
 import command._
 import util.parsing.combinator.JavaTokenParsers
 import scala.Predef._
+import pl.project13.tinytermpm.util.Preferences
 
 class CommandParser extends JavaTokenParsers {
 
-  def positiveNumber: Parser[Int] =
+  val positiveNumber: Parser[Int] =
     """\d+""".r ^^ { n => n.toInt }
   
   def tasks: Parser[ApiCommand] = ("tasks") ^^ {
@@ -25,12 +26,19 @@ class CommandParser extends JavaTokenParsers {
     case p => ProjectsCommand()
   }
 
-  def projectDetails: Parser[ApiCommand] = "project" ~> positiveNumber ^^ {
-    case id => ProjectsCommand(Some(id))
+  def projectDetails: Parser[ApiCommand] = "project " ~> opt(positiveNumber) ^^ {
+    case id => id match {
+      case None => ProjectsCommand(Some(Preferences.ProjectId))
+      case Some(id) => ProjectsCommand(Some(id))
+    }
   }
 
-  def stories: Parser[ApiCommand] = ("s" | "stories") ^^ {
-    case tasks => StoriesCommand()
+  def stories: Parser[ApiCommand] = ("userstories" | "stories") ^^ {
+    case stories => StoriesCommand()
+  }
+
+  def storyDetails: Parser[ApiCommand] = ("s " | "userstory " | "story ") ~> positiveNumber ^^ {
+    case id => StoriesCommand(Some(id))
   }
   
   def exit: Parser[ApiCommand] = ("wq" | "q" | "exit" | "quit") ^^ {
@@ -41,7 +49,7 @@ class CommandParser extends JavaTokenParsers {
     case id => SetSelfIdCommand(id)
   }
 
-  def create: Parser[ApiCommand] = ("c" | "create") ~ opt(createWhat) ^^ {
+  def create: Parser[ApiCommand] = ("c " | "create ") ~ opt("what?!?!?!?") ^^ {
     case c ~ optWhat =>
       optWhat match {
         case Some("task") => CreateTaskCommand()
@@ -52,13 +60,11 @@ class CommandParser extends JavaTokenParsers {
   
   def nothing: Parser[ApiCommand] = "" ^^ { case it => NoOpCommand() }
 
-  def createWhat: Parser[String] = "task" | "story"
-  
   def command: Parser[ApiCommand] = (
     tasks 
-  | users 
-  | stories 
-  | create 
+  | storyDetails
+  | stories
+  | users
   | iam
   | exit
   | projects
