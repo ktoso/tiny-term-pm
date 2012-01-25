@@ -5,12 +5,11 @@ import akka.actor.TypedActor
 import pl.project13.tinytermpm.marshalling.JAXBUtil
 import pl.project13.tinytermpm.util.{ScalaJConversions, ApiPreferences}
 import pl.project13.tinytermpm.api.response.UsersResponse
-import pl.project13.tinytermpm.api.{TimeSheetApi, UsersApi}
-import pl.project13.tinytermpm.api.model.{Activity, User}
-import javax.swing.AbstractCellEditor
+import pl.project13.tinytermpm.api.TimeSheetApi
+import pl.project13.tinytermpm.api.model.Activity
 
 class TimeSheetActor(config: ApiPreferences) extends TypedActor with TimeSheetApi
- with HttpDispatch with ScalaJConversions {
+with HttpDispatch with ScalaJConversions {
 
   import dispatch._
 
@@ -19,7 +18,7 @@ class TimeSheetActor(config: ApiPreferences) extends TypedActor with TimeSheetAp
 
     val response = h(url(urlz) as_str)
 
-    val users= JAXBUtil.unmarshal(classOf[UsersResponse], response)
+    val users = JAXBUtil.unmarshal(classOf[UsersResponse], response)
 
     users.getUsers
   }
