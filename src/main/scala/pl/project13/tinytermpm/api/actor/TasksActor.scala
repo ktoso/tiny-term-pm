@@ -15,7 +15,7 @@ class TasksActor(config: ApiPreferences) extends TypedActor with TasksApi
   import dispatch._
 
   def forUserStory(storyId: Long) = {
-    val urlz = config.apiUrl("userstory" / storyId / "tasks")
+    val urlz = config.apiUrl("userstory"/storyId/"tasks")
 
     val response = h(url(urlz) as_str)
 
@@ -29,14 +29,14 @@ class TasksActor(config: ApiPreferences) extends TypedActor with TasksApi
   }
 
   def detailsFor(taskId: Long) = {
-      val urlz = config.apiUrl("task" / taskId)
+    val urlz = config.apiUrl("task"/taskId)
 
-      val response = h(url(urlz) as_str)
+    val response = h(url(urlz) as_str)
 
-      val task= JAXBUtil.unmarshal[Task](response)
+    val task= JAXBUtil.unmarshal[Task](response)
 
-      task
-    }
+    task
+  }
 
   def update(task: Task) {
 

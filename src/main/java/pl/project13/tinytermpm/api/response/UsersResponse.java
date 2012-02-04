@@ -26,7 +26,7 @@ public class UsersResponse {
     @Override
     public String toString() {
         return "UsersResponse{" +
-                "_project=" + _users +
+                "_iterations=" + _users +
                 '}';
     }
 }

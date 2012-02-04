@@ -3,18 +3,22 @@ package pl.project13.tinytermpm
 import annotation.tailrec
 import api._
 import api.actor._
-import api.model.UserStory
 import cli.Cli
 import cli.parsing.command._
 import cli.parsing.CommandParser
 import akka.actor.TypedActor
 import akka.util.duration._
-import cli.util.SafeBoolean
+import akka.dispatch.{Future, Futures}
+import cli.util.{LimitedString, SafeBoolean}
+import pl.project13.tinytermpm.api.model.{Task, UserStory}
 import util.verb.Quittable._
-import util.{Constants, Preferences}
 import cli.util.ColorizedStrings._
+import collection.immutable.List
+import util.{ScalaJConversions, Constants, Preferences}
+import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 
-class Repl(cli: Cli) {
+class Repl(cli: Cli) extends ScalaJConversions {
   implicit val _cli = cli // for fluent quittable usage
   import cli._
 
@@ -24,7 +28,11 @@ class Repl(cli: Cli) {
 
   val users = TypedActor.newInstance(classOf[UsersApi], new UsersActor(Preferences), (10 seconds).toMillis)
   val stories = TypedActor.newInstance(classOf[UserStoriesApi], new UserStoriesActor(Preferences), (10 seconds).toMillis)
+  val tasks = TypedActor.newInstance(classOf[TasksApi], new TasksActor(Preferences), (10 seconds).toMillis)
   val projects = TypedActor.newInstance(classOf[ProjectsApi], new ProjectsActor(Preferences), (10 seconds).toMillis)
+  val iterations = TypedActor.newInstance(classOf[IterationsApi], new IterationsActor(Preferences), (10 seconds).toMillis)
+
+  val allActors = users :: stories :: projects :: iterations :: Nil
 
   tell("Done!")
   tell("")
@@ -48,8 +56,27 @@ class Repl(cli: Cli) {
     }
   }
 
-  def doTasks() {
+  def doMyCurrentTasks() {
+    val userStories = stories.forCurrentIterationIn(Preferences.ProjectId)
 
+    val futures = for (userStory <- userStories)
+      yield Future {
+        val detailedTasks  = tasks
+          .forUserStory(userStory)
+          .par
+          .map { task => tasks.detailsFor(task.id) }
+        (userStory, detailedTasks)
+      }
+
+    val storiesAndTasks = Futures.sequence(futures, (60 millis).toMillis).get
+    for((story, tasks) <- storiesAndTasks) {
+      tell("Story: %s (Iteration: %s)", story.name.bold, story.iterationId)
+      tasks.foreach { task =>
+        import task._
+        tell(" |#%d [%s] - %s", id, status.name, name)
+        if(description != "") tell(" |Desc: %s", LimitedString(description, 80))
+      }
+    }
   }
 
   def doHelp() {
@@ -86,7 +113,7 @@ class Repl(cli: Cli) {
     tell("Hello, %s!".format(user.name.bold))
   }
 
-  def doCreateStory() {
+  def doCreateStoryInCurrentIteration() {
     tell("Create user story in "+Preferences.ProjectName.bold+"... (enter single "+"q".bold+" to abort)")
 
     quittable {
@@ -95,7 +122,7 @@ class Repl(cli: Cli) {
       val name = askOrQuit("Story name:")
       story.setName(name)
 
-      val addDefaultTasks = SafeBoolean(askOrQuit("Add default tasks [y/n]"))
+      val addDefaultTasks = SafeBoolean(askOrQuit("Add default tasks [y/N]"))
 
       tell("Fire and forget, creating user story...")
       stories.create(story, addDefaultTasks)
@@ -118,7 +145,7 @@ class Repl(cli: Cli) {
   }
 
   def doExit() {
-    (users :: projects :: Nil).foreach{ TypedActor.stop(_) }
+    allActors.foreach{ TypedActor.stop(_) }
     exitRepl = true
   }
 
@@ -137,14 +164,14 @@ class Repl(cli: Cli) {
 
       case SetSelfIdCommand(id) => doSelfId(id)
 
-      case TasksCommand() => doTasks()
+      case TasksCommand() => doMyCurrentTasks()
 
       case ProjectsCommand(id) => doProjects(id)
 
       case StoriesCommand(None) => doUserStories()
       case StoriesCommand(Some(id)) => doUserStoryDetails(id)
         
-      case CreateStoryCommand() => doCreateStory()
+      case CreateStoryCommand() => doCreateStoryInCurrentIteration()
       case CreateCommand() => println("implement do create")
 
       case DeleteStoryCommand(id) => doDeleteStory(id)

@@ -27,7 +27,6 @@ class Iteration {
   @BeanProperty
   var duration: Long = 0
 
-  @BeanProperty
   @XmlElement(name = "activity")
-  var timesheet: List[Activity] = new ArrayList[Activity]
+  var activities: List[Activity] = new ArrayList[Activity]
 }

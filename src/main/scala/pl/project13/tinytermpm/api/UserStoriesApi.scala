@@ -30,7 +30,5 @@ trait UserStoriesApi {
   def update(userStory: UserStory): UserStory
 
 
-  def createInCurrentIteration(story: UserStory)
-
   def create(story: UserStory, addDefaultTasks: Boolean = false)
 }

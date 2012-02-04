@@ -35,6 +35,8 @@ class JlineCli extends Cli {
   reader.setCompletionHandler(new CandidateListCompletionHandler());
   reader.addCompletor(new CommandsCompletor)
 
+  val w = 80
+
   def shell() = {
     reader.readLine()
   }

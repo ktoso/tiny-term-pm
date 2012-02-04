@@ -24,5 +24,5 @@ trait TasksApi {
     delete(task.id)
   }
 
-  def delete(taskId: Long): Unit
+  def delete(taskId: Long)
 }

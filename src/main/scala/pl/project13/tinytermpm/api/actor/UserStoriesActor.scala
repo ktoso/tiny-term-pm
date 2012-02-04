@@ -3,7 +3,7 @@ package pl.project13.tinytermpm.api.actor
 import pl.project13.tinytermpm.util.PathConversions._
 import akka.actor.TypedActor
 import pl.project13.tinytermpm.marshalling.JAXBUtil
-import pl.project13.tinytermpm.api.{UserStoriesApi, TasksApi}
+import pl.project13.tinytermpm.api.UserStoriesApi
 import pl.project13.tinytermpm.api.model.{Status, Priority, UserStory, Task}
 import org.joda.time.DateTime
 import pl.project13.tinytermpm.api.response.{UserStoriesResponse, TasksResponse}
@@ -62,7 +62,8 @@ class UserStoriesActor(config: ApiPreferences) extends TypedActor with UserStori
 
   def update(userStory: UserStory) = null
 
-  def createInCurrentIteration(story: UserStory) {
+  def createInIteration(story: UserStory, addDefaultTasks: Boolean = false) {
+
   }
 
   def create(story: UserStory, addDefaultTasks: Boolean = false) {

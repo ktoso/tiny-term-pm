@@ -10,16 +10,16 @@ import java.util.List;
 public class IterationsResponse {
 
     @XmlElement(name = "iteration")
-    List<Iteration> _project;
+    public List<Iteration> _iterations;
 
     public IterationsResponse() {
     }
 
-    public List<Iteration> getIterations() {
-        return _project;
-    }
-
-    public void setIterations(List<Iteration> projects) {
-        this._project = projects;
-    }
+//    public List<Iteration> getIterations() {
+//        return _iterations;
+//    }
+//
+//    public void setIterations(List<Iteration> iterations) {
+//        this._iterations = iterations;
+//    }
 }
