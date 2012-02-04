@@ -1,6 +1,6 @@
 package pl.project13.tinytermpm.api.actor
 
-import akka.actor.{TypedActor, Actor}
+import akka.actor.Actor
 
 
 trait HttpDispatch { this: Actor =>

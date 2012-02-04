@@ -23,9 +23,9 @@ trait UserStoriesApi {
   def forIteration(iterationId: Long): List[UserStory]
 
 
-  def delete(userStoryId: Long)
+  def deleteStory(userStoryId: Long)
   
-  def detailsFor(userStoryId: Long): UserStory
+  def detailsFor(userStoryId: Long): Option[UserStory]
 
   def update(userStory: UserStory): UserStory
 

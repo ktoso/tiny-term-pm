@@ -43,7 +43,7 @@ class Repl(cli: Cli) {
         
         all.foreach{ p => 
           import p._
-          println("%d - %s".format(id, name))
+          tell("%d - %s".format(id, name))
         }
     }
   }
@@ -73,17 +73,17 @@ class Repl(cli: Cli) {
   }
   
   def doUserStoryDetails(id: Long) {
-    val story = stories.detailsFor(id)
-    
-    tell("""|#%d - %s
-            |[tags: %s]""".stripMargin.format(story.id, story.name.bold, story.tags))
+    stories.detailsFor(id).map { story =>
+      tell("""|#%d - %s
+              |[tags: %s]""".stripMargin.format(story.id, story.name.bold, story.tags))
+    }
   }
 
   def doSelfId(id: Int) {
     val user = users.detailsFor(id)
     Preferences.saveUserDetails(id, user.name)
 
-    tell("Hello, " + user.name + "!")
+    tell("Hello, %s!".format(user.name.bold))
   }
 
   def doCreateStory() {
@@ -99,6 +99,21 @@ class Repl(cli: Cli) {
 
       tell("Fire and forget, creating user story...")
       stories.create(story, addDefaultTasks)
+    }
+  }
+
+  def doDeleteStory(id: Long) {
+    stories.detailsFor(id) match { 
+      case Some(story) =>
+        askForBoolean("""Delete user story: "%s"? [y/N]""".format(story.name), false) match {
+          case false => return
+          case _ =>
+        }
+
+        tell("Fire and forget, deleting user story...")
+        stories.deleteStory(story.id)
+
+      case None => err("No userstory with id [%d] found!", id)
     }
   }
 
@@ -131,6 +146,8 @@ class Repl(cli: Cli) {
         
       case CreateStoryCommand() => doCreateStory()
       case CreateCommand() => println("implement do create")
+
+      case DeleteStoryCommand(id) => doDeleteStory(id)
 
       case HelpCommand() => doHelp()
       case ExitCommand() => doExit()

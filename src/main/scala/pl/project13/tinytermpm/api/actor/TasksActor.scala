@@ -19,7 +19,7 @@ class TasksActor(config: ApiPreferences) extends TypedActor with TasksApi
 
     val response = h(url(urlz) as_str)
 
-    val tasksResponse = JAXBUtil.unmarshal(classOf[TasksResponse], response)
+    val tasksResponse = JAXBUtil.unmarshal[TasksResponse](response)
 
     tasksResponse.getTasks
   }
@@ -33,7 +33,7 @@ class TasksActor(config: ApiPreferences) extends TypedActor with TasksApi
 
       val response = h(url(urlz) as_str)
 
-      val task= JAXBUtil.unmarshal(classOf[Task], response)
+      val task= JAXBUtil.unmarshal[Task](response)
 
       task
     }

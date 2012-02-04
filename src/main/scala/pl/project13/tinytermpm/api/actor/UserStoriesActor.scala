@@ -8,7 +8,6 @@ import pl.project13.tinytermpm.api.model.{Status, Priority, UserStory, Task}
 import org.joda.time.DateTime
 import pl.project13.tinytermpm.api.response.{UserStoriesResponse, TasksResponse}
 import pl.project13.tinytermpm.util.{Preferences, ScalaJConversions, ApiPreferences}
-import sun.awt.CharsetString
 
 class UserStoriesActor(config: ApiPreferences) extends TypedActor with UserStoriesApi
   with HttpDispatch
@@ -25,30 +24,41 @@ class UserStoriesActor(config: ApiPreferences) extends TypedActor with UserStori
 
     val response = h(url(urlz) as_str)
 
-    val tasksResponse = JAXBUtil.unmarshal(classOf[UserStoriesResponse], response)
+    val tasksResponse = JAXBUtil.unmarshal[UserStoriesResponse](response)
 
     tasksResponse.getUserStories
   }
 
   def forCurrentIterationIn(projectId: Long) = {
-    val urlz = config.apiUrl("project" / projectId / "iteration/current/userstories")
+    val urlz = config.apiUrl("project"/projectId/"iteration/current/userstories")
 
     val response = h(url(urlz) as_str)
 
-    val tasksResponse = JAXBUtil.unmarshal(classOf[UserStoriesResponse], response)
+    val tasksResponse = JAXBUtil.unmarshal[UserStoriesResponse](response)
 
     tasksResponse.getUserStories
   }
   
-  def delete(userStory: Long) {
-    val urlz = config.apiUrl("userstory"/userStory/"tasks")
+  def deleteStory(userStory: Long) {
+    val urlz = config.apiUrl("userstory"/userStory)
     
-    h(url(urlz).DELETE.>|)
+    h(url(urlz).DELETE as_str)
   }
 
   def forIteration(iterationId: Long) = null
 
-  def detailsFor(userStoryId: Long) = null
+  def detailsFor(userStoryId: Long) = {
+    val urlz = config.apiUrl("userstory"/userStoryId)
+    
+    try {
+      val response = h(url(urlz) as_str)
+      val detailsResponse = JAXBUtil.unmarshal[UserStory](response)
+
+      Some(detailsResponse)
+    } catch {
+      case e => None
+    }
+  }
 
   def update(userStory: UserStory) = null
 

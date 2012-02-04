@@ -19,7 +19,7 @@ class TimeSheetActor(config: ApiPreferences) extends TypedActor with TimeSheetAp
 
     val response = h(url(urlz) as_str)
 
-    val users = JAXBUtil.unmarshal(classOf[UsersResponse], response)
+    val users = JAXBUtil.unmarshal[UsersResponse](response)
 
     users.getUsers
   }
@@ -37,7 +37,7 @@ class TimeSheetActor(config: ApiPreferences) extends TypedActor with TimeSheetAp
 
     val response = h(url(urlz) << activityJson as_str)
 
-    val createdActivity = JAXBUtil.unmarshal(classOf[Activity], response)
+    val createdActivity = JAXBUtil.unmarshal[Activity](response)
   }
 
   def delete(taskId: Long, activity: Activity) {

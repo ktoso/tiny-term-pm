@@ -19,7 +19,7 @@ class ProjectsActor(config: ApiPreferences) extends TypedActor with ProjectsApi
 
     val response = h(url(urlz) as_str)
 
-    val projectsResponse= JAXBUtil.unmarshal(classOf[ProjectsResponse], response)
+    val projectsResponse= JAXBUtil.unmarshal[ProjectsResponse](response)
 
     projectsResponse.getProjects
   }
@@ -29,7 +29,7 @@ class ProjectsActor(config: ApiPreferences) extends TypedActor with ProjectsApi
 
     val response = h(url(urlz) as_str)
 
-    val project= JAXBUtil.unmarshal(classOf[Project], response)
+    val project= JAXBUtil.unmarshal[Project](response)
 
     project
   }

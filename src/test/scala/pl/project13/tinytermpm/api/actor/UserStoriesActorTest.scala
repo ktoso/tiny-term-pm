@@ -30,6 +30,6 @@ class UserStoriesActorTest extends FlatSpec with ShouldMatchers {
 
     // cleanup
     val id = all.find { _.name == name }.get.id
-    stories.delete(id)
+    stories.deleteStory(id)
   }
 }

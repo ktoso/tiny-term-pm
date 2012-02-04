@@ -19,7 +19,7 @@ class UsersActor(config: ApiPreferences) extends TypedActor with UsersApi
 
     val response = h(url(urlz) as_str)
 
-    val users= JAXBUtil.unmarshal(classOf[UsersResponse], response)
+    val users= JAXBUtil.unmarshal[UsersResponse](response)
 
     users.getUsers
   }
@@ -29,7 +29,7 @@ class UsersActor(config: ApiPreferences) extends TypedActor with UsersApi
 
     val response = h(url(urlz) as_str)
 
-    val user = JAXBUtil.unmarshal(classOf[User], response)
+    val user = JAXBUtil.unmarshal[User](response)
 
     user
   }

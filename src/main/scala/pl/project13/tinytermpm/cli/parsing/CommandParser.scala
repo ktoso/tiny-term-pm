@@ -49,10 +49,6 @@ class CommandParser extends JavaTokenParsers with CombinedParsers {
     case id => SetSelfIdCommand(id)
   }
 
-  def create: Parser[ApiCommand] = ("c" | "create") ^^ {
-    case c => CreateCommand()
-  }
-
   def createTask: Parser[ApiCommand] = combinedParser("create", "c")("task") ^^ {
     case c => CreateTaskCommand()
   }
@@ -60,15 +56,20 @@ class CommandParser extends JavaTokenParsers with CombinedParsers {
   def createStory: Parser[ApiCommand] = combinedParser("create", "c")("story") ^^ {
     case c => CreateStoryCommand()
   }
+
+  def deleteStory: Parser[ApiCommand] = combinedParser("delete", "d")("story") ~ positiveNumber ^^ {
+    case c ~ id => DeleteStoryCommand(id)
+  }
   
   def nothing: Parser[ApiCommand] = "" ^^ {
     case it => NoOpCommand()
   }
 
   def command: Parser[ApiCommand] = (
-    create
-  | createStory
-  | createTask
+//    create
+    createStory
+  | deleteStory
+//  | createTask
   | tasks
   | storyDetails
   | stories

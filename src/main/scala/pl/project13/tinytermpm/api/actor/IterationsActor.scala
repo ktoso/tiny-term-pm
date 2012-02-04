@@ -18,7 +18,7 @@ class IterationsActor(config: ApiPreferences) extends TypedActor with Iterations
 
     val response = h(url(urlz) as_str)
 
-    val projectsResponse = JAXBUtil.unmarshal(classOf[ProjectsResponse], response)
+    val projectsResponse = JAXBUtil.unmarshal[ProjectsResponse](response)
 
     projectsResponse.getProjects
   }
@@ -28,7 +28,7 @@ class IterationsActor(config: ApiPreferences) extends TypedActor with Iterations
 
     val rsp = h(url(urlz) as_str)
 
-    val response = JAXBUtil.unmarshal(classOf[IterationsResponse], rsp)
+    val response = JAXBUtil.unmarshal[IterationsResponse](rsp)
 
     response.getIterations
   }

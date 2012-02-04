@@ -21,12 +21,16 @@ class CommandsCompletor extends Completor {
     val candidates = candidatesList.asInstanceOf[JList[String]]
 
     def addIfMatchOrEmptyBuffer(command: String) {
-      if (buffer.isEmpty || partialMatch (buffer, command))
+      if (buffer.isEmpty || partialMatch(buffer, command))
         candidates.add(command)
     }
 
     List(
       "users", "user",
+      "create task", "c task",
+      "stories",
+      "create story ", "create userstory ", "c story ", "c userstory ",
+      "delete story ", "delete userstory ", "d story ", "d userstory ",
       "projects", "project",
       "iterations",
       "i am", "self",

@@ -20,6 +20,9 @@ case class CreateCommand() extends ApiCommand
 case class CreateTaskCommand() extends CreateCommand
 case class CreateStoryCommand() extends CreateCommand
 
+case class DeleteCommand() extends ApiCommand
+case class DeleteStoryCommand(id: Long) extends DeleteCommand
+
 case class ExitCommand() extends ApiCommand
 
 case class HelpCommand() extends ApiCommand
