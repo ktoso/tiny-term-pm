@@ -3,18 +3,22 @@ package pl.project13.tinytermpm.api.actor
 import pl.project13.tinytermpm.util.PathConversions._
 import akka.actor.TypedActor
 import pl.project13.tinytermpm.marshalling.JAXBUtil
-import pl.project13.tinytermpm.util.{ScalaJConversions, ApiPreferences}
 import pl.project13.tinytermpm.api.{UserStoriesApi, TasksApi}
 import pl.project13.tinytermpm.api.model.{Status, Priority, UserStory, Task}
 import org.joda.time.DateTime
 import pl.project13.tinytermpm.api.response.{UserStoriesResponse, TasksResponse}
+import pl.project13.tinytermpm.util.{Preferences, ScalaJConversions, ApiPreferences}
+import sun.awt.CharsetString
 
 class UserStoriesActor(config: ApiPreferences) extends TypedActor with UserStoriesApi
-with HttpDispatch with ScalaJConversions {
+  with HttpDispatch
+  with ScalaJConversions {
 
+  import pl.project13.scala.dispatch.fixes._
   import dispatch._
 
-  def forProject(projectId: Long, ownerId: Option[Long] = None, priority: Option[Priority] = None,
+  def forProject(projectId: Long, ownerId: Option[Long] = None,
+                 priority: Option[Priority] = None,
                  status: Option[Status] = None, createdAtFrom: Option[DateTime] = None,
                  createdAtTo: Option[DateTime] = None) = {
     val urlz = config.apiUrl("project" / projectId / "userstories")
@@ -35,6 +39,12 @@ with HttpDispatch with ScalaJConversions {
 
     tasksResponse.getUserStories
   }
+  
+  def delete(userStory: Long) {
+    val urlz = config.apiUrl("userstory"/userStory/"tasks")
+    
+    h(url(urlz).DELETE.>|)
+  }
 
   def forIteration(iterationId: Long) = null
 
@@ -42,11 +52,13 @@ with HttpDispatch with ScalaJConversions {
 
   def update(userStory: UserStory) = null
 
-  def createInCurrentIteration(story: UserStory) = {
-    0
+  def createInCurrentIteration(story: UserStory) {
   }
 
-  def create(story: UserStory) = {
-    0
+  def create(story: UserStory, addDefaultTasks: Boolean = false) {
+    val urlz = config.apiUrl("project"/Preferences.ProjectId/"userstories?addDefaultTasks="+addDefaultTasks)
+
+    val storyJson = JAXBUtil.marshal(story)
+    h(url(urlz) << (storyJson, XML) as_str)
   }
 }

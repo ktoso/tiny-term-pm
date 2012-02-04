@@ -9,10 +9,13 @@ import cli.parsing.command._
 import cli.parsing.CommandParser
 import akka.actor.TypedActor
 import akka.util.duration._
+import cli.util.SafeBoolean
+import util.verb.Quittable._
 import util.{Constants, Preferences}
 import cli.util.ColorizedStrings._
 
 class Repl(cli: Cli) {
+  implicit val _cli = cli // for fluent quittable usage
   import cli._
 
   tell("Loading REPL...")
@@ -65,7 +68,7 @@ class Repl(cli: Cli) {
   def doUserStories() {
     val storiesInProject = stories.forProject(Preferences.ProjectId)
 
-    tell("UserStories in project ["+Preferences.ProjectName.bold+"]")
+    tell(""+storiesInProject.size+" stories in project ["+Preferences.ProjectName.bold+"]")
     printStories(storiesInProject)
   }
   
@@ -81,6 +84,22 @@ class Repl(cli: Cli) {
     Preferences.saveUserDetails(id, user.name)
 
     tell("Hello, " + user.name + "!")
+  }
+
+  def doCreateStory() {
+    tell("Create user story in "+Preferences.ProjectName.bold+"... (enter single "+"q".bold+" to abort)")
+
+    quittable {
+      val story = new UserStory
+
+      val name = askOrQuit("Story name:")
+      story.setName(name)
+
+      val addDefaultTasks = SafeBoolean(askOrQuit("Add default tasks [y/n]"))
+
+      tell("Fire and forget, creating user story...")
+      stories.create(story, addDefaultTasks)
+    }
   }
 
   def doExit() {
@@ -110,6 +129,7 @@ class Repl(cli: Cli) {
       case StoriesCommand(None) => doUserStories()
       case StoriesCommand(Some(id)) => doUserStoryDetails(id)
         
+      case CreateStoryCommand() => doCreateStory()
       case CreateCommand() => println("implement do create")
 
       case HelpCommand() => doHelp()

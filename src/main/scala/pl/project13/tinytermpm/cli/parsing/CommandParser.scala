@@ -5,7 +5,7 @@ import util.parsing.combinator.JavaTokenParsers
 import scala.Predef._
 import pl.project13.tinytermpm.util.Preferences
 
-class CommandParser extends JavaTokenParsers {
+class CommandParser extends JavaTokenParsers with CombinedParsers {
 
   val positiveNumber: Parser[Int] =
     """\d+""".r ^^ { n => n.toInt }
@@ -27,7 +27,7 @@ class CommandParser extends JavaTokenParsers {
   }
 
   def projectDetails: Parser[ApiCommand] = "project " ~> opt(positiveNumber) ^^ {
-    case id => id match {
+    case _id => _id match {
       case None => ProjectsCommand(Some(Preferences.ProjectId))
       case Some(id) => ProjectsCommand(Some(id))
     }
@@ -37,7 +37,7 @@ class CommandParser extends JavaTokenParsers {
     case stories => StoriesCommand()
   }
 
-  def storyDetails: Parser[ApiCommand] = ("s " | "userstory " | "story ") ~> positiveNumber ^^ {
+  def storyDetails: Parser[ApiCommand] = ("userstory " | "story ") ~> positiveNumber ^^ {
     case id => StoriesCommand(Some(id))
   }
   
@@ -49,19 +49,27 @@ class CommandParser extends JavaTokenParsers {
     case id => SetSelfIdCommand(id)
   }
 
-  def create: Parser[ApiCommand] = ("c " | "create ") ~ opt("what?!?!?!?") ^^ {
-    case c ~ optWhat =>
-      optWhat match {
-        case Some("task") => CreateTaskCommand()
-        case Some("story") => CreateStoryCommand()
-        case None => CreateCommand()
-      }
+  def create: Parser[ApiCommand] = ("c" | "create") ^^ {
+    case c => CreateCommand()
+  }
+
+  def createTask: Parser[ApiCommand] = combinedParser("create", "c")("task") ^^ {
+    case c => CreateTaskCommand()
+  }
+    
+  def createStory: Parser[ApiCommand] = combinedParser("create", "c")("story") ^^ {
+    case c => CreateStoryCommand()
   }
   
-  def nothing: Parser[ApiCommand] = "" ^^ { case it => NoOpCommand() }
+  def nothing: Parser[ApiCommand] = "" ^^ {
+    case it => NoOpCommand()
+  }
 
   def command: Parser[ApiCommand] = (
-    tasks 
+    create
+  | createStory
+  | createTask
+  | tasks
   | storyDetails
   | stories
   | users
@@ -75,7 +83,7 @@ class CommandParser extends JavaTokenParsers {
 }
 object CommandParser extends CommandParser {
   def parse(content: String): ApiCommand = {
-    parseAll(command, content) match {
+    parseAll(command, content.trim) match {
       case Success(res: ApiCommand, _) => res
       case x: Failure => UnknownCommand(content)
       case x: Error => throw new RuntimeException(x.toString)

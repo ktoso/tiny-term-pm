@@ -1,6 +1,6 @@
 package pl.project13.tinytermpm.cli.parsing
 
-import command.StoriesCommand
+import command.{CreateStoryCommand, StoriesCommand}
 import org.scalatest.{FlatSpec, FunSuite}
 import org.scalatest.matchers.ShouldMatchers
 

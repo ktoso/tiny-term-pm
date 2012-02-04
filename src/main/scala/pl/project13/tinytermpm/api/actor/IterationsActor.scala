@@ -8,7 +8,8 @@ import pl.project13.tinytermpm.api.IterationsApi
 import pl.project13.tinytermpm.api.response.{IterationsResponse, ProjectsResponse}
 
 class IterationsActor(config: ApiPreferences) extends TypedActor with IterationsApi
-with HttpDispatch with ScalaJConversions {
+  with HttpDispatch
+  with ScalaJConversions {
 
   import dispatch._
 

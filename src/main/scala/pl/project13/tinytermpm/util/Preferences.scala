@@ -6,12 +6,17 @@ import verb.Using._
 import pl.project13.tinytermpm.api.model.Project
 import java.util.Properties
 import java.io.{FileNotFoundException, FileOutputStream, FileInputStream}
+import com.github.tototoshi.base64.Base64
 
 trait ApiPreferences {
   def ServerUrl: String
   def ApiKey: String
 
-  def apiUrl(path: String) = ServerUrl/path+"?token="+ApiKey
+  // todo replace with my URL DSL
+  def apiUrl(path: String) = {
+    val tokenPart = if(path.contains("?")) "&token=" + ApiKey else "?token=" + ApiKey
+    ServerUrl/path+tokenPart
+  }
 }
 
 trait HarvestPreferences {
@@ -35,9 +40,7 @@ object Preferences extends Preferences {
 
     props.put("harvest.server.url", url)
     props.put("harvest.username", username)
-    props.put("harvest.password", password)
-
-    println("props = " + props)
+    props.put("harvest.password", Base64.encode(password.getBytes))
 
     saveProps(props)
   }
@@ -64,7 +67,7 @@ object Preferences extends Preferences {
     val props = loadProps
     
     props.put("server.url", serverUrl)
-    props.put("api.key", apiKey)
+    props.put("api.key", Base64.encode(apiKey.getBytes))
 
     saveProps(props)
   }
@@ -88,11 +91,11 @@ object Preferences extends Preferences {
   }
 
   lazy val ServerUrl = loadProps.getProperty("server.url")
-  lazy val ApiKey = loadProps.getProperty("api.key")
+  lazy val ApiKey = new String(Base64.decode(loadProps.getProperty("api.key")).map(_.toChar).toArray)
 
   lazy val HarvestServerUrl = loadProps.getProperty("harvest.server.url")
   lazy val HarvestUsername = loadProps.getProperty("harvest.username")
-  lazy val HarvestPassword = loadProps.getProperty("harvest.password")
+  lazy val HarvestPassword = new String(Base64.decode(loadProps.getProperty("harvest.password")).map(_.toChar).toArray)
 
   // look like a constant ;-)
   def UserName = loadProps.getProperty("user.name", "Anonymous")

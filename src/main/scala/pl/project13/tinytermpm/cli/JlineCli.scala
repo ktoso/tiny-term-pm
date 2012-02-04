@@ -2,6 +2,7 @@ package pl.project13.tinytermpm.cli
 
 import completion.CommandsCompletor
 import jline.{CandidateListCompletionHandler, ConsoleReader}
+import pl.project13.tinytermpm.util.verb.Quittable
 
 
 trait Cli {
@@ -10,6 +11,7 @@ trait Cli {
   def warn(message: Any)
   def shell(): String
   def askFor(message: Any): String
+  def askOrQuit(message: Any): String
 }
 
 class JlineCli extends Cli {
@@ -27,6 +29,14 @@ class JlineCli extends Cli {
   def askFor(message: Any) = {
     Console.print(message + " ")
     Console.readLine()
+  }
+  
+  def askOrQuit(message: Any) = {
+    val line = askFor(message)
+    
+    if(Quittable.Triggers.contains(line)) throw new Quittable.Quit()
+
+    line
   }
 
   def tel(message: Any) {

@@ -9,7 +9,8 @@ import pl.project13.tinytermpm.api.response.UsersResponse
 import pl.project13.tinytermpm.api.model.User
 
 class UsersActor(config: ApiPreferences) extends TypedActor with UsersApi
- with HttpDispatch with ScalaJConversions {
+  with HttpDispatch
+  with ScalaJConversions {
 
   import dispatch._
 

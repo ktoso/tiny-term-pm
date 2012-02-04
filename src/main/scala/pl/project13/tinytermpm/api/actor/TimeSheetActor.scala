@@ -9,7 +9,8 @@ import pl.project13.tinytermpm.api.TimeSheetApi
 import pl.project13.tinytermpm.api.model.Activity
 
 class TimeSheetActor(config: ApiPreferences) extends TypedActor with TimeSheetApi
-with HttpDispatch with ScalaJConversions {
+  with HttpDispatch
+  with ScalaJConversions {
 
   import dispatch._
 

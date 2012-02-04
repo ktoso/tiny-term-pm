@@ -23,12 +23,14 @@ trait UserStoriesApi {
   def forIteration(iterationId: Long): List[UserStory]
 
 
+  def delete(userStoryId: Long)
+  
   def detailsFor(userStoryId: Long): UserStory
 
   def update(userStory: UserStory): UserStory
 
 
-  def createInCurrentIteration(story: UserStory): Long
+  def createInCurrentIteration(story: UserStory)
 
-  def create(story: UserStory): Long
+  def create(story: UserStory, addDefaultTasks: Boolean = false)
 }

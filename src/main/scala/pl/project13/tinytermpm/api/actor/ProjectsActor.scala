@@ -9,7 +9,8 @@ import pl.project13.tinytermpm.api.response.ProjectsResponse
 import pl.project13.tinytermpm.api.model.Project
 
 class ProjectsActor(config: ApiPreferences) extends TypedActor with ProjectsApi
- with HttpDispatch with ScalaJConversions {
+  with HttpDispatch
+  with ScalaJConversions {
 
   import dispatch._
 

@@ -9,7 +9,8 @@ import pl.project13.tinytermpm.api.model.{UserStory, Task}
 import pl.project13.tinytermpm.api.response.TasksResponse
 
 class TasksActor(config: ApiPreferences) extends TypedActor with TasksApi
- with HttpDispatch with ScalaJConversions {
+  with HttpDispatch
+  with ScalaJConversions {
 
   import dispatch._
 
