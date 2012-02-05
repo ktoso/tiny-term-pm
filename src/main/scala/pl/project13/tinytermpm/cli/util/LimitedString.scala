@@ -1,5 +1,7 @@
 package pl.project13.tinytermpm.cli.util
 
+import jline.ConsoleReader
+
 /**
  * Creates a string representing either just the string,
  * or it "trimmed" to the max length.
@@ -16,10 +18,10 @@ case class LimitedString(
   trimMarker: String = "[...]") {
 
   override val toString = maxLength match {
-    case 0 => string
+    case 0 => string.replaceAll("\n", "")
     case maxLen if string.length > maxLen =>
       string.substring(0, maxLen - trimMarker.length) + trimMarker
-    case _ => string
+    case _ => string.replaceAll("\n", "")
   }
     
 }

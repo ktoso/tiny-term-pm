@@ -37,6 +37,10 @@ class CommandParser extends JavaTokenParsers with CombinedParsers {
     case stories => StoriesCommand()
   }
 
+  def taskDetails: Parser[ApiCommand] = ("task " | "t ") ~> positiveNumber ^^ {
+    case id => TaskDetailsCommand(id)
+  }
+
   def storyDetails: Parser[ApiCommand] = ("userstory " | "story ") ~> positiveNumber ^^ {
     case id => StoriesCommand(Some(id))
   }
@@ -71,6 +75,7 @@ class CommandParser extends JavaTokenParsers with CombinedParsers {
   | deleteStory
 //  | createTask
   | tasks
+  | taskDetails
   | storyDetails
   | stories
   | users

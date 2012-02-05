@@ -31,11 +31,16 @@ class TasksActor(config: ApiPreferences) extends TypedActor with TasksApi
   def detailsFor(taskId: Long) = {
     val urlz = config.apiUrl("task"/taskId)
 
+    try {
     val response = h(url(urlz) as_str)
 
     val task= JAXBUtil.unmarshal[Task](response)
 
-    task
+    Some(task)
+      
+    } catch {
+      case _ => None
+    }
   }
 
   def update(task: Task) {

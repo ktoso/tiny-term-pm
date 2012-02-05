@@ -18,7 +18,7 @@ import util.{ScalaJConversions, Constants, Preferences}
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
 
-class Repl(cli: Cli) extends ScalaJConversions {
+class Repl(cli: Cli) {
   implicit val _cli = cli // for fluent quittable usage
   import cli._
 
@@ -64,7 +64,7 @@ class Repl(cli: Cli) extends ScalaJConversions {
         val detailedTasks  = tasks
           .forUserStory(userStory)
           .par
-          .map { task => tasks.detailsFor(task.id) }
+          .map { task => tasks.detailsFor(task.id).get }
         (userStory, detailedTasks)
       }
 
@@ -73,9 +73,24 @@ class Repl(cli: Cli) extends ScalaJConversions {
       tell("Story: %s (Iteration: %s)", story.name.bold, story.iterationId)
       tasks.foreach { task =>
         import task._
-        tell(" |#%d [%s] - %s", id, status.name, name)
-        if(description != "") tell(" |Desc: %s", LimitedString(description, 80))
+        tell(" #%d [%s] - %s %s",
+          id, status.coloredName, name,
+          if(description.length > 0) "\n Desc: "+LimitedString(description, 120) else "")
       }
+    }
+  }
+
+  def doTaskDetails(id: Long) {
+    tasks.detailsFor(id) match {
+      case Some(task) =>
+        import task._
+        tell("#%d [%s] - %s", task.id, status.coloredName, name)
+        tell("Desc:\n%s", description)
+        for(assigned <- assignedUsers) tell("Assigned: %s <%s>", assigned.name, assigned.email)
+        for(comment <- comments) tell("Comment by %s on %s: %s", comment.author, comment.date.toString("hh:mm dd/mm/yyyy"), comment.body)
+
+      case None =>
+        err("No task with id [%d] found!", id)
     }
   }
 
@@ -165,6 +180,7 @@ class Repl(cli: Cli) extends ScalaJConversions {
       case SetSelfIdCommand(id) => doSelfId(id)
 
       case TasksCommand() => doMyCurrentTasks()
+      case TaskDetailsCommand(id) => doTaskDetails(id)
 
       case ProjectsCommand(id) => doProjects(id)
 

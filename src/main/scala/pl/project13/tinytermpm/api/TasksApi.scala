@@ -14,7 +14,7 @@ trait TasksApi {
   def createIn(story: UserStory, task: Task): Long
 
 
-  def detailsFor(taskId: Long): Task
+  def detailsFor(taskId: Long): Option[Task]
   
   
   def update(task: Task)

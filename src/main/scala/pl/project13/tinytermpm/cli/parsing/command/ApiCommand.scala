@@ -7,6 +7,7 @@ case class NoOpCommand() extends ApiCommand
 case class ProjectsCommand(projectId: Option[Long] = None) extends ApiCommand
 
 case class TasksCommand() extends ApiCommand
+case class TaskDetailsCommand(taskId: Long) extends ApiCommand
 
 case class UnknownCommand(input: String) extends ApiCommand
 
