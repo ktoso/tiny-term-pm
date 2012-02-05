@@ -15,7 +15,7 @@ class User {
   @BeanProperty
   var email: String = null
   @BeanProperty
-  var active: Boolean = false
+  var active: Boolean = true
   @BeanProperty
   var initials: String = null
 }

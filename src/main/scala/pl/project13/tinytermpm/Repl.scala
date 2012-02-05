@@ -9,14 +9,15 @@ import cli.parsing.CommandParser
 import akka.actor.TypedActor
 import akka.util.duration._
 import akka.dispatch.{Future, Futures}
-import cli.util.{PrettyDate, PrettyDateTime, LimitedString, SafeBoolean}
-import pl.project13.tinytermpm.api.model.{Task, UserStory}
+import cli.util._
+import pl.project13.tinytermpm.api.model.{User, Task, UserStory}
 import util.verb.Quittable._
 import cli.util.ColorizedStrings._
 import collection.immutable.List
 import util.{ScalaJConversions, Constants, Preferences}
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
+import java.util.Collections
 
 class Repl(cli: Cli) {
   implicit val _cli = cli // for fluent quittable usage
@@ -74,7 +75,7 @@ class Repl(cli: Cli) {
       tasks.foreach { task =>
         import task._
         tell(" #%d [%s] - %s %s",
-          id, status.coloredName, name,
+          id, Safe(status.coloredName), name,
           if(description.length > 0) "\n Desc: "+LimitedString(description, 120) else "")
       }
     }
@@ -103,7 +104,7 @@ class Repl(cli: Cli) {
     allUsers.filter(_.active).foreach {
       u =>
         import u._
-        println("%d: %s <%s>".format(id, name, email))
+        tell("%d: %s <%s>".format(id, name, email))
     }
   }
 
@@ -150,7 +151,41 @@ class Repl(cli: Cli) {
     tell("Iterations: ")
     for (iteration <- iters) {
       tell(" Iteration %d: %s", iteration.id, iteration.name.bold, iteration.startDate)
-      tell("  from: %s to: %s", PrettyDate(iteration.startDate), PrettyDate(iteration.endDate))
+      tell("  From: %s to: %s", PrettyDate(iteration.startDate), PrettyDate(iteration.endDate))
+      if (iteration.goal != "") tell("  Goal: %s", LimitedString(iteration.goal, 120))
+    }
+  }
+
+  def doCreateTaskInSelectedStory() {
+    tell("Select Story to create the new task for:")
+    val userStories = stories.forCurrentIterationIn(Preferences.ProjectId)
+    val taskStates = projects.detailsFor(Preferences.ProjectId).taskStatuses.toList
+    val defaultStatus = taskStates.head
+
+    userStories.foreach{ s => tell("#%d - %s", s.id, s.name) }
+
+    val ids = userStories.map{ _.id }
+    askForLongSelectionOrQuit("Select a user story (or "+bold("q")+"uit)", ids) match {
+      case Some(storyId) =>
+
+        val task = new Task {
+          name = askFor("Task name:")
+          description = askFor("Description:")
+          if(askForBoolean("Assign task to you?", false)) {
+            assignedUsers = Collections.singletonList(new User { id = Preferences.UserId })
+          }
+
+          taskStates.foreach { state => tell("(%s) [%s]", state.id, state.coloredName) }
+          val statusId = askForLongSelection("What is the status of this task [%s]?".format(defaultStatus.name),
+            taskStates.map(_.id),
+            Some(defaultStatus.id))
+
+          status = taskStates.find(_.id == statusId).get
+        }
+
+        tasks.createIn(storyId, task)
+        
+      case None => return
     }
   }
 
@@ -200,7 +235,7 @@ class Repl(cli: Cli) {
       case StoriesCommand(Some(id)) => doUserStoryDetails(id)
         
       case CreateStoryCommand() => doCreateStoryInCurrentIteration()
-      case CreateCommand() => println("implement do create")
+      case CreateCommand() => doCreateTaskInSelectedStory()
 
       case DeleteStoryCommand(id) => doDeleteStory(id)
 

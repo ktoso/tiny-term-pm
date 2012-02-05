@@ -62,14 +62,10 @@ class UserStoriesActor(config: ApiPreferences) extends TypedActor with UserStori
 
   def update(userStory: UserStory) = null
 
-  def createInIteration(story: UserStory, addDefaultTasks: Boolean = false) {
-
-  }
-
   def create(story: UserStory, addDefaultTasks: Boolean = false) {
     val urlz = config.apiUrl("project"/Preferences.ProjectId/"userstories?addDefaultTasks="+addDefaultTasks)
 
-    val storyJson = JAXBUtil.marshal(story)
-    h(url(urlz) << (storyJson, XML) as_str)
+    val body = JAXBUtil.marshal(story)
+    h(url(urlz) << (body, XML) as_str)
   }
 }

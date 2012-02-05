@@ -12,6 +12,7 @@ class TasksActor(config: ApiPreferences) extends TypedActor with TasksApi
   with HttpDispatch
   with ScalaJConversions {
 
+  import pl.project13.scala.dispatch.fixes._
   import dispatch._
 
   def forUserStory(storyId: Long) = {
@@ -24,8 +25,12 @@ class TasksActor(config: ApiPreferences) extends TypedActor with TasksApi
     tasksResponse.getTasks
   }
 
-  def createIn(story: UserStory, task: Task) = {
-    0
+  def createIn(storyId: Long, task: Task) {
+    val urlz = config.apiUrl("userstory"/storyId/"tasks")
+
+    val body = JAXBUtil.marshal(task)
+
+    h(url(urlz) << (body, XML) as_str)
   }
 
   def detailsFor(taskId: Long) = {

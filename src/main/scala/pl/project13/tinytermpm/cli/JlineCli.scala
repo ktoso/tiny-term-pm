@@ -5,6 +5,7 @@ import jline.{CandidateListCompletionHandler, ConsoleReader}
 import pl.project13.tinytermpm.util.verb.Quittable
 import util.SafeBoolean
 import util.ColorizedStrings._
+import annotation.tailrec
 
 
 trait Cli {
@@ -23,8 +24,22 @@ trait Cli {
   def shell(): String
 
   def askFor(message: Any): String
-  def askForBoolean(message: Any, defaultValue: Boolean): Boolean
   def askOrQuit(message: Any): String
+
+  def askForLongSelection(message: Any, acceptable: List[Long], defaultVal: Option[Long] = None): Long =
+    askForSelection(message, acceptable.map(_.toString)).toLong
+  def askForIntSelection(message: Any, acceptable: List[Int], defaultVal: Option[Int] = None): Int =
+    askForSelection(message, acceptable.map(_.toString)).toInt
+  def askForSelection(message: Any, acceptable: List[String], defaultVal: Option[String] = None): String
+
+  def askForLongSelectionOrQuit(message: Any, acceptable: List[Long], defaultVal: Option[Long] = None): Option[Long] =
+    askForSelectionOrQuit(message, acceptable.map(_.toString)).flatMap { s => Some(s.toLong) }
+  def askForIntSelectionOrQuit(message: Any, acceptable: List[Int], defaultVal: Option[Int] = None): Option[Int] =
+    askForSelectionOrQuit(message, acceptable.map(_.toString)).flatMap { s => Some(s.toInt) }
+  def askForSelectionOrQuit(message: Any, acceptable: List[String], defaultVal: Option[String] = None): Option[String]
+
+  def askForBoolean(message: Any, defaultValue: Boolean): Boolean
+
 }
 
 class JlineCli extends Cli {
@@ -44,6 +59,25 @@ class JlineCli extends Cli {
   def askFor(message: Any) = {
     Console.print(message + " ")
     Console.readLine()
+  }
+
+  @tailrec
+  final def askForSelection(message: Any, acceptable: List[String], defaultVal: Option[String] = None): String = {
+    val response = askFor(message)
+
+    if(response == "" && defaultVal.isDefined) defaultVal.get
+    else if(acceptable.contains(response)) response
+    else askForSelection(message, acceptable)
+  }
+
+  @tailrec
+  final def askForSelectionOrQuit(message: Any, acceptable: List[String], defaultVal: Option[String] = None): Option[String] = {
+    val response = askFor(message)
+
+    if(response == "q") None
+    else if(response == "" && defaultVal.isDefined) defaultVal
+    else if(acceptable.contains(response)) Some(response)
+    else askForSelectionOrQuit(message, acceptable)
   }
   
   def askForBoolean(message: Any, defaultValue: Boolean = false) = {

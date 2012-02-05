@@ -11,7 +11,10 @@ trait TasksApi {
   def forUserStory(storyId: Long): List[Task]
 
 
-  def createIn(story: UserStory, task: Task): Long
+  def createIn(story: UserStory, task: Task) {
+    createIn(story.id, task)
+  }
+  def createIn(storyId: Long, task: Task)
 
 
   def detailsFor(taskId: Long): Option[Task]

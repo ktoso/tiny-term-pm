@@ -9,7 +9,7 @@ import javax.xml.bind.annotation.{XmlElement, XmlElementWrapper, XmlRootElement}
 class Task {
 
   @BeanProperty
-  var id: Long = 0
+  var id: java.lang.Long = _
 
   @BeanProperty
   var name: String = ""
