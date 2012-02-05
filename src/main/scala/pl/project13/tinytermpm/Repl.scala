@@ -188,6 +188,21 @@ class Repl(cli: Cli) {
       case None => return
     }
   }
+  
+  def doDeleteTasks(ids: List[Long]) {
+    ids.foreach { id =>
+      tasks.detailsFor(id) match {
+        case Some(task) =>
+          if(askForBoolean("""Delete task [%s] "%s" [y/N]?""".format(Safe(task.status.coloredName), task.name.bold), false)) {
+            tasks.delete(task.id)
+            tell("Fire and forget, deleting task...")
+          }
+
+        case None =>
+          err("No task with id [%d] found!", id)
+      }      
+    }
+  }
 
   def doDeleteStory(id: Long) {
     stories.detailsFor(id) match { 
@@ -238,6 +253,7 @@ class Repl(cli: Cli) {
       case CreateCommand() => doCreateTaskInSelectedStory()
 
       case DeleteStoryCommand(id) => doDeleteStory(id)
+      case DeleteTasksCommand(ids) => doDeleteTasks(ids)
 
       case HelpCommand() => doHelp()
       case ExitCommand() => doExit()

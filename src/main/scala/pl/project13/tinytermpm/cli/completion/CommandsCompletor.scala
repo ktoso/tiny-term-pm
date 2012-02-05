@@ -31,6 +31,7 @@ class CommandsCompletor extends Completor {
       "stories",
       "create story ", "create userstory ", "c story ", "c userstory ",
       "delete story ", "delete userstory ", "d story ", "d userstory ",
+      "delete task ", "d task ",
       "projects", "project",
       "iterations",
       "i am", "self",

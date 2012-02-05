@@ -53,6 +53,8 @@ class TasksActor(config: ApiPreferences) extends TypedActor with TasksApi
   }
 
   def delete(taskId: Long) {
+    val urlz = config.apiUrl("task"/taskId)
 
+    h(url(urlz).DELETE as_str)
   }
 }
