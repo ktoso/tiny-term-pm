@@ -48,6 +48,10 @@ class CommandParser extends JavaTokenParsers with CombinedParsers {
   def exit: Parser[ApiCommand] = ("wq" | "q" | "exit" | "quit") ^^ {
     case exit => ExitCommand()
   }
+
+  def iterations: Parser[ApiCommand] = ("iterations" | "i") ^^ {
+    case exit => IterationsCommand()
+  }
   
   def iam: Parser[ApiCommand] = ("i am " | "self ") ~> positiveNumber ^^ {
     case id => SetSelfIdCommand(id)
@@ -70,10 +74,10 @@ class CommandParser extends JavaTokenParsers with CombinedParsers {
   }
 
   def command: Parser[ApiCommand] = (
-//    create
     createStory
   | deleteStory
-//  | createTask
+  | createTask
+  | iterations
   | tasks
   | taskDetails
   | storyDetails

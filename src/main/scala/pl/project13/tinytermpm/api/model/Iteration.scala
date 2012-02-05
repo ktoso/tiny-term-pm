@@ -19,13 +19,18 @@ class Iteration {
   var plannedVelocity: Double = 0
   @BeanProperty
   var position: Long = 0
+
   @BeanProperty
   var startDate: DateTime = null // 2006-04-01
+
+  @BeanProperty
+  def endDate = startDate.plusDays(duration)  // calculated
+
   /**
    * Iteration duration in days
    */
   @BeanProperty
-  var duration: Long = 0
+  var duration: Int = 0
 
   @XmlElement(name = "activity")
   var activities: List[Activity] = new ArrayList[Activity]

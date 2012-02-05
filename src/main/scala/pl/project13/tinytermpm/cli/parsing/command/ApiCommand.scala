@@ -11,6 +11,8 @@ case class TaskDetailsCommand(taskId: Long) extends ApiCommand
 
 case class UnknownCommand(input: String) extends ApiCommand
 
+case class IterationsCommand() extends ApiCommand
+
 case class SetSelfIdCommand(id: Int) extends ApiCommand
 
 case class UsersCommand() extends ApiCommand

@@ -9,7 +9,7 @@ import cli.parsing.CommandParser
 import akka.actor.TypedActor
 import akka.util.duration._
 import akka.dispatch.{Future, Futures}
-import cli.util.{LimitedString, SafeBoolean}
+import cli.util.{PrettyDate, PrettyDateTime, LimitedString, SafeBoolean}
 import pl.project13.tinytermpm.api.model.{Task, UserStory}
 import util.verb.Quittable._
 import cli.util.ColorizedStrings._
@@ -87,7 +87,7 @@ class Repl(cli: Cli) {
         tell("#%d [%s] - %s", task.id, status.coloredName, name)
         tell("Desc:\n%s", description)
         for(assigned <- assignedUsers) tell("Assigned: %s <%s>", assigned.name, assigned.email)
-        for(comment <- comments) tell("Comment by %s on %s: %s", comment.author, comment.date.toString("hh:mm dd/mm/yyyy"), comment.body)
+        for(comment <- comments) tell("Comment by %s on %s: %s", comment.author, PrettyDateTime(comment.date), comment.body)
 
       case None =>
         err("No task with id [%d] found!", id)
@@ -143,6 +143,16 @@ class Repl(cli: Cli) {
       stories.create(story, addDefaultTasks)
     }
   }
+  
+  def doIterations() {
+    val iters = iterations.forProject(Preferences.ProjectId)
+
+    tell("Iterations: ")
+    for (iteration <- iters) {
+      tell(" Iteration %d: %s", iteration.id, iteration.name.bold, iteration.startDate)
+      tell("  from: %s to: %s", PrettyDate(iteration.startDate), PrettyDate(iteration.endDate))
+    }
+  }
 
   def doDeleteStory(id: Long) {
     stories.detailsFor(id) match { 
@@ -182,6 +192,8 @@ class Repl(cli: Cli) {
       case TasksCommand() => doMyCurrentTasks()
       case TaskDetailsCommand(id) => doTaskDetails(id)
 
+      case IterationsCommand() => doIterations()
+        
       case ProjectsCommand(id) => doProjects(id)
 
       case StoriesCommand(None) => doUserStories()
