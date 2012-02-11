@@ -48,7 +48,7 @@ object Dependencies {
 
   val guava                 = "com.google.guava"      %   "guava"                 % "11.0"
 
-  val scalatest             = "org.scalatest"         %%  "scalatest"             % "1.6.1"
+  val scalatest             = "org.scalatest"         %%  "scalatest"             % "1.7.1"
   val mockito               = "org.mockito"           %   "mockito-core"          % "1.8.5"
 
   val testing               = Seq(scalatest % "test", mockito % "test")

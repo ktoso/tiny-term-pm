@@ -3,10 +3,10 @@ package pl.project13.tinytermpm.util
 import Constants._
 import PathConversions._
 import verb.Using._
-import pl.project13.tinytermpm.api.model.Project
 import java.util.Properties
 import java.io.{FileNotFoundException, FileOutputStream, FileInputStream}
 import com.github.tototoshi.base64.Base64
+import pl.project13.tinytermpm.api.tinypm.model.Project
 
 trait ApiPreferences {
   def ServerUrl: String
@@ -23,6 +23,11 @@ trait HarvestPreferences {
   def HarvestServerUrl: String
   def HarvestUsername: String
   def HarvestPassword: String
+  
+  // todo replace with my URL DSL
+  def harvestUrl(path: String) = {
+    HarvestServerUrl/path
+  }
 }
 
 trait Preferences

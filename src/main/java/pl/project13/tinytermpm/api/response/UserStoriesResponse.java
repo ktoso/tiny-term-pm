@@ -1,6 +1,6 @@
 package pl.project13.tinytermpm.api.response;
 
-import pl.project13.tinytermpm.api.model.UserStory;
+import pl.project13.tinytermpm.api.tinypm.model.UserStory;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;

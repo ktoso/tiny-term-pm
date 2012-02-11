@@ -27,6 +27,8 @@ case class DeleteCommand() extends ApiCommand
 case class DeleteStoryCommand(id: Long) extends DeleteCommand
 case class DeleteTasksCommand(ids: List[Long]) extends DeleteCommand
 
+case class TimeTodayHarvestCommand() extends ApiCommand
+
 case class ExitCommand() extends ApiCommand
 
 case class HelpCommand() extends ApiCommand

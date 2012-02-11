@@ -24,6 +24,7 @@ trait Cli {
   def shell(): String
 
   def askFor(message: Any): String
+  def askForHidden(message: Any): String
   def askOrQuit(message: Any): String
 
   def askForLongSelection(message: Any, acceptable: List[Long], defaultVal: Option[Long] = None): Long =
@@ -57,8 +58,11 @@ class JlineCli extends Cli {
   }
 
   def askFor(message: Any) = {
-    Console.print(message + " ")
-    Console.readLine()
+    reader.readLine(message + " ")
+  }
+
+  def askForHidden(message: Any) = {
+    reader.readLine(message + " ", '*')
   }
 
   @tailrec

@@ -40,7 +40,7 @@ class Runner(cli: Cli) {
 
           val url = askFor("""Harvest server url ("http://project13.harvestapp.com"):""")
           val user = askFor("Harvest username:")
-          val pass = askFor("Harvest password:")
+          val pass = askForHidden("Harvest password:")
 
           tel("Saving harvest settings... ")
           Preferences.saveHarvestDetails(url, user, pass)

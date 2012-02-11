@@ -1,11 +1,12 @@
 package pl.project13.tinytermpm.api
 
-import actor.UsersActor
 import org.scalatest.{FlatSpec, FunSuite}
 import org.scalatest.matchers.ShouldMatchers
 import akka.testkit.TestKit
 import akka.actor.TypedActor
 import pl.project13.tinytermpm.util.{ApiPreferences, Preferences}
+import tinypm.actor.UsersActor
+import tinypm.UsersApi
 
 
 class UsersActorTest extends FlatSpec with ShouldMatchers {

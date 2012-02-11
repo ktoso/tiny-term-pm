@@ -2,7 +2,6 @@ package pl.project13.tinytermpm
 
 import annotation.tailrec
 import api._
-import api.actor._
 import cli.Cli
 import cli.parsing.command._
 import cli.parsing.CommandParser
@@ -10,7 +9,11 @@ import akka.actor.TypedActor
 import akka.util.duration._
 import akka.dispatch.{Future, Futures}
 import cli.util._
-import pl.project13.tinytermpm.api.model.{User, Task, UserStory}
+import harvest.actor.DailyTimerActor
+import harvest.DailyTimerApi
+import tinypm.actor._
+import tinypm._
+import model._
 import util.verb.Quittable._
 import cli.util.ColorizedStrings._
 import collection.immutable.List
@@ -32,6 +35,7 @@ class Repl(cli: Cli) {
   val tasks = TypedActor.newInstance(classOf[TasksApi], new TasksActor(Preferences), (10 seconds).toMillis)
   val projects = TypedActor.newInstance(classOf[ProjectsApi], new ProjectsActor(Preferences), (10 seconds).toMillis)
   val iterations = TypedActor.newInstance(classOf[IterationsApi], new IterationsActor(Preferences), (10 seconds).toMillis)
+  val dailyTimer = TypedActor.newInstance(classOf[DailyTimerApi], new DailyTimerActor(Preferences), (10 seconds).toMillis)
 
   val allActors = users :: stories :: projects :: iterations :: Nil
 
@@ -219,6 +223,12 @@ class Repl(cli: Cli) {
     }
   }
 
+  def doHarvestTimeToday() {
+    val time = dailyTimer.timeToday()
+    
+    tell("Harvest said you worked [%s] today.", time.toString.bold)
+  }
+
   def doExit() {
     allActors.foreach{ TypedActor.stop(_) }
     exitRepl = true
@@ -255,6 +265,8 @@ class Repl(cli: Cli) {
       case DeleteStoryCommand(id) => doDeleteStory(id)
       case DeleteTasksCommand(ids) => doDeleteTasks(ids)
 
+      case TimeTodayHarvestCommand() => doHarvestTimeToday()
+        
       case HelpCommand() => doHelp()
       case ExitCommand() => doExit()
         
