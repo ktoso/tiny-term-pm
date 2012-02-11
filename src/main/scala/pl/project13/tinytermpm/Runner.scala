@@ -68,5 +68,7 @@ object Runner {
 
     tell("Happy hakking!")
     tell("")
+    
+    System.exit(0)
   }
 }
