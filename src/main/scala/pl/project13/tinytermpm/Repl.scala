@@ -209,6 +209,10 @@ class Repl(cli: Cli) {
     }
   }
 
+  def doWhoAmI() {
+    tell("You are: %s (and awesome!)", Preferences.UserName.bold)
+  }
+
   def doDeleteStory(id: Long) {
     stories.detailsFor(id) match { 
       case Some(story) =>
@@ -269,7 +273,9 @@ class Repl(cli: Cli) {
       case DeleteTasksCommand(ids) => doDeleteTasks(ids)
 
       case TimeOnDayHarvestCommand(day) => doHarvestTime(day)
-        
+
+      case WhoAmICommand() => doWhoAmI()
+
       case HelpCommand() => doHelp()
       case ExitCommand() => doExit()
         

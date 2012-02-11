@@ -62,10 +62,14 @@ class CommandParser extends JavaTokenParsers with CombinedParsers {
     case c => CreateTaskCommand()
   }
 
+  def whoAmI: Parser[ApiCommand] = "whoami" ^^ {
+    case _ => WhoAmICommand()
+  }
+
   def timeTodayShorthand: Parser[ApiCommand] = "tt" ^^ {
     case _ => TimeOnDayHarvestCommand(new DateTime)
   }
-  
+
   def timeToday: Parser[ApiCommand] = ("time" | "t") ~> ".*".r ^^ {
     case "today" | "t" => TimeOnDayHarvestCommand(new DateTime)
     case "yesterday" | "y" => TimeOnDayHarvestCommand((new DateTime).minusDays(1))
@@ -99,6 +103,7 @@ class CommandParser extends JavaTokenParsers with CombinedParsers {
   | tasks
   | timeToday
   | taskDetails
+  | whoAmI
   | storyDetails
   | stories
   | users

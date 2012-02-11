@@ -43,6 +43,7 @@ class CommandsCompletor extends Completor {
       "tasks",
       "comments",
       "timesheet",
+      "whoami",
       "help",
       "quit", "exit"
     ).foreach(addIfMatchOrEmptyBuffer(_))

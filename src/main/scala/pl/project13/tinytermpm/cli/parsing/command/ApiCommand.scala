@@ -32,6 +32,8 @@ case class DeleteTasksCommand(ids: List[Long]) extends DeleteCommand
 case class TimeTodayHarvestCommand() extends ApiCommand
 case class TimeOnDayHarvestCommand(day: DateTime) extends ApiCommand
 
+case class WhoAmICommand() extends ApiCommand
+
 case class ExitCommand() extends ApiCommand
 
 case class HelpCommand() extends ApiCommand
