@@ -69,5 +69,6 @@ class Daily {
   var forDay: DateTime = _
 
   @XmlElementWrapper(name = "day_entries")
+  @XmlElement(name = "day_entry")
   var dayEntries: java.util.List[DayEntry] = new ArrayList[DayEntry]
 }

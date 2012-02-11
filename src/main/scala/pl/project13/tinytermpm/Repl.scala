@@ -21,6 +21,7 @@ import util.{ScalaJConversions, Constants, Preferences}
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
 import java.util.Collections
+import org.joda.time.DateTime
 
 class Repl(cli: Cli) {
   implicit val _cli = cli // for fluent quittable usage
@@ -37,7 +38,7 @@ class Repl(cli: Cli) {
   val iterations = TypedActor.newInstance(classOf[IterationsApi], new IterationsActor(Preferences), (10 seconds).toMillis)
   val dailyTimer = TypedActor.newInstance(classOf[DailyTimerApi], new DailyTimerActor(Preferences), (10 seconds).toMillis)
 
-  val allActors = users :: stories :: projects :: iterations :: Nil
+  val allActors = users :: stories :: projects :: iterations :: dailyTimer :: Nil
 
   tell("Done!")
   tell("")
@@ -223,13 +224,15 @@ class Repl(cli: Cli) {
     }
   }
 
-  def doHarvestTimeToday() {
-    val time = dailyTimer.timeToday()
+  def doHarvestTime(day: DateTime) {
+    val time = dailyTimer.timeOnDay(day)
     
     tell("Harvest said you worked [%s] today.", time.toString.bold)
   }
 
   def doExit() {
+    tell("Shutting down...")
+
     allActors.foreach{ TypedActor.stop(_) }
     exitRepl = true
   }
@@ -265,7 +268,7 @@ class Repl(cli: Cli) {
       case DeleteStoryCommand(id) => doDeleteStory(id)
       case DeleteTasksCommand(ids) => doDeleteTasks(ids)
 
-      case TimeTodayHarvestCommand() => doHarvestTimeToday()
+      case TimeOnDayHarvestCommand(day) => doHarvestTime(day)
         
       case HelpCommand() => doHelp()
       case ExitCommand() => doExit()

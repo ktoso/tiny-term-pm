@@ -34,7 +34,7 @@ class CommandsCompletor extends Completor {
       "delete task ", "d task ",
       "projects", "project",
       "iterations",
-      "time today", "t today",
+      "time today", "t today", "tt",
       "time yesterday", "t yesterday",
       "time week", "t week",
       "time month", "t month",

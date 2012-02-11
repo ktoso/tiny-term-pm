@@ -25,10 +25,13 @@ class DayEntry {
   var taskId: Long = _
   var task: String = ""
 
+  @XmlElement(name = "hours")
   var hours: Double = 0 
   
   @XmlElement(name = "started_at")
   var startedAt: String = "" // todo make this a time
   @XmlElement(name = "ended_at")
   var endedAt: String = "" // todo make this a time
+
+
 }

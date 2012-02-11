@@ -4,6 +4,7 @@ import command._
 import util.parsing.combinator.JavaTokenParsers
 import scala.Predef._
 import pl.project13.tinytermpm.util.Preferences
+import org.joda.time.DateTime
 
 class CommandParser extends JavaTokenParsers with CombinedParsers {
 
@@ -61,8 +62,16 @@ class CommandParser extends JavaTokenParsers with CombinedParsers {
     case c => CreateTaskCommand()
   }
 
-  def timeToday: Parser[ApiCommand] = combinedParser("time", "t")("today") ^^ {
-    case c => TimeTodayHarvestCommand()
+  def timeTodayShorthand: Parser[ApiCommand] = "tt" ^^ {
+    case _ => TimeOnDayHarvestCommand(new DateTime)
+  }
+  
+  def timeToday: Parser[ApiCommand] = ("time" | "t") ~> ".*".r ^^ {
+    case "today" | "t" => TimeOnDayHarvestCommand(new DateTime)
+    case "yesterday" | "y" => TimeOnDayHarvestCommand((new DateTime).minusDays(1))
+//    case "week" | "w" => TimeTodayHarvestCommand()
+//    case "month" | "m" => TimeTodayHarvestCommand()
+    case desc => throw new RuntimeException("Unable to parse timespan descriptor: " + desc)
   }
     
   def createStory: Parser[ApiCommand] = combinedParser("create", "c")("story") ^^ {

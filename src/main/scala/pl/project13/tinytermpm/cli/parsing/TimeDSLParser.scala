@@ -27,7 +27,7 @@ class TimeDSLParser extends JavaTokenParsers {
 //  def day / days
 
   def percent: Parser[TimeSpan] =
-    positiveNumber <~ ("%" | " %" | "p" | " p" | "proc" | " proc") ^^ {
+    positiveNumber <~ ("%" | " %" | "p" | " p" | "percent") ^^ {
       case workDayPercent => TimeSpan((8.0 / workDayPercent).toInt)
   }
 

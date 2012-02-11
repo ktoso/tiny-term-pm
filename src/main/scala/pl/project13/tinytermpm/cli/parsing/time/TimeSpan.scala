@@ -7,8 +7,8 @@ case class TimeSpan(hours: Int = 0, minutes: Int = 0) {
 }
 object TimeSpan {
   def apply(hours: Double): TimeSpan = {
-    val h= hours.round.toInt
-    val m = ((hours - h) / 0.6).toInt
+    val h= hours.toInt
+    val m = ((hours - h) * 60).toInt
     
     TimeSpan(h, m)
   } 

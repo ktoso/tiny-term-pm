@@ -9,37 +9,37 @@ import annotation.tailrec
 
 
 trait Cli {
-  def tel(message: Any)
-  def tel(message: String, interpolations: Any*)
+  def tel(message: => Any)
+  def tel(message: => String, interpolations: Any*)
 
-  def tell(message: Any)
-  def tell(message: String, interpolations: Any*)
+  def tell(message: => Any)
+  def tell(message: => String, interpolations: Any*)
 
-  def warn(message: Any)
-  def warn(message: String, interpolations: Any*)
+  def warn(message: => Any)
+  def warn(message: => String, interpolations: Any*)
 
-  def err(message: Any)
-  def err(message: String, interpolations: Any*)
+  def err(message: => Any)
+  def err(message: => String, interpolations: Any*)
 
   def shell(): String
 
-  def askFor(message: Any): String
-  def askForHidden(message: Any): String
-  def askOrQuit(message: Any): String
+  def askFor(message: => Any): String
+  def askForHidden(message: => Any): String
+  def askOrQuit(message: => Any): String
 
-  def askForLongSelection(message: Any, acceptable: List[Long], defaultVal: Option[Long] = None): Long =
+  def askForLongSelection(message: => Any, acceptable: List[Long], defaultVal: Option[Long] = None): Long =
     askForSelection(message, acceptable.map(_.toString)).toLong
-  def askForIntSelection(message: Any, acceptable: List[Int], defaultVal: Option[Int] = None): Int =
+  def askForIntSelection(message: => Any, acceptable: List[Int], defaultVal: Option[Int] = None): Int =
     askForSelection(message, acceptable.map(_.toString)).toInt
-  def askForSelection(message: Any, acceptable: List[String], defaultVal: Option[String] = None): String
+  def askForSelection(message: => Any, acceptable: List[String], defaultVal: Option[String] = None): String
 
-  def askForLongSelectionOrQuit(message: Any, acceptable: List[Long], defaultVal: Option[Long] = None): Option[Long] =
+  def askForLongSelectionOrQuit(message: => Any, acceptable: List[Long], defaultVal: Option[Long] = None): Option[Long] =
     askForSelectionOrQuit(message, acceptable.map(_.toString)).flatMap { s => Some(s.toLong) }
-  def askForIntSelectionOrQuit(message: Any, acceptable: List[Int], defaultVal: Option[Int] = None): Option[Int] =
+  def askForIntSelectionOrQuit(message: => Any, acceptable: List[Int], defaultVal: Option[Int] = None): Option[Int] =
     askForSelectionOrQuit(message, acceptable.map(_.toString)).flatMap { s => Some(s.toInt) }
-  def askForSelectionOrQuit(message: Any, acceptable: List[String], defaultVal: Option[String] = None): Option[String]
+  def askForSelectionOrQuit(message: => Any, acceptable: List[String], defaultVal: Option[String] = None): Option[String]
 
-  def askForBoolean(message: Any, defaultValue: Boolean): Boolean
+  def askForBoolean(message: => Any, defaultValue: Boolean): Boolean
 
 }
 
@@ -57,16 +57,14 @@ class JlineCli extends Cli {
     reader.readLine()
   }
 
-  def askFor(message: Any) = {
+  def askFor(message: => Any) =
     reader.readLine(message + " ")
-  }
 
-  def askForHidden(message: Any) = {
+  def askForHidden(message: => Any) =
     reader.readLine(message + " ", '*')
-  }
 
   @tailrec
-  final def askForSelection(message: Any, acceptable: List[String], defaultVal: Option[String] = None): String = {
+  final def askForSelection(message: => Any, acceptable: List[String], defaultVal: Option[String] = None): String = {
     val response = askFor(message)
 
     if(response == "" && defaultVal.isDefined) defaultVal.get
@@ -75,7 +73,7 @@ class JlineCli extends Cli {
   }
 
   @tailrec
-  final def askForSelectionOrQuit(message: Any, acceptable: List[String], defaultVal: Option[String] = None): Option[String] = {
+  final def askForSelectionOrQuit(message: => Any, acceptable: List[String], defaultVal: Option[String] = None): Option[String] = {
     val response = askFor(message)
 
     if(response == "q") None
@@ -84,11 +82,10 @@ class JlineCli extends Cli {
     else askForSelectionOrQuit(message, acceptable)
   }
   
-  def askForBoolean(message: Any, defaultValue: Boolean = false) = {
+  def askForBoolean(message: => Any, defaultValue: Boolean = false) =
     SafeBoolean(askFor(message), defaultValue)
-  }
   
-  def askOrQuit(message: Any) = {
+  def askOrQuit(message: => Any) = {
     val line = askFor(message)
     
     if(Quittable.Triggers.contains(line)) throw new Quittable.Quit()
@@ -96,35 +93,35 @@ class JlineCli extends Cli {
     line
   }
 
-  def tel(message: Any) {
+  def tel(message: => Any) {
     Console.print(message)
   }
 
-  def tel(message: String, interpolations: Any*) {
+  def tel(message: => String, interpolations: Any*) {
     Console.print(message.format(interpolations: _*))
   }
 
-  def tell(message: Any) {
+  def tell(message: => Any) {
     Console.println(message)
   }
 
-  def tell(message: String, interpolations: Any*) {
+  def tell(message: => String, interpolations: Any*) {
     Console.println(message.format(interpolations: _*))
   }
 
-  def warn(message: Any) {
+  def warn(message: => Any) {
     Console.println(message.toString.yellow)
   }
   
-  def warn(message: String, interpolations: Any*) {
+  def warn(message: => String, interpolations: Any*) {
     Console.println(message.toString.format(interpolations: _*).yellow)
   }
 
-  def err(message: Any) {
+  def err(message: => Any) {
     Console.println(message.toString.red)
   }
 
-  def err(message: String, interpolations: Any*) {
+  def err(message: => String, interpolations: Any*) {
     Console.println(message.toString.format(interpolations: _*).red)
   }
 }
