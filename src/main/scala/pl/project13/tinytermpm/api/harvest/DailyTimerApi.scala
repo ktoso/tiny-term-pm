@@ -6,7 +6,7 @@ import org.joda.time.DateTime
 trait DailyTimerApi {
   def timeToday(): TimeSpan
   def timeOnDay(day: DateTime): TimeSpan
-  def timeDuring(startDay: DateTime, days: Int): Double
+  def timeDuring(startDay: DateTime, days: Int): TimeSpan
 
   def stop()
 }

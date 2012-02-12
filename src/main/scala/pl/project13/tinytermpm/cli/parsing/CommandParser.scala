@@ -73,9 +73,16 @@ class CommandParser extends JavaTokenParsers with CombinedParsers {
   def timeToday: Parser[ApiCommand] = ("time" | "t") ~> ".*".r ^^ {
     case "today" | "t" => TimeOnDayHarvestCommand(new DateTime)
     case "yesterday" | "y" => TimeOnDayHarvestCommand((new DateTime).minusDays(1))
-//    case "week" | "w" => TimeTodayHarvestCommand()
-//    case "month" | "m" => TimeTodayHarvestCommand()
-    case desc => throw new RuntimeException("Unable to parse timespan descriptor: " + desc)
+    case "week" | "w" =>
+      val now = new DateTime
+      TimeOnDaysHarvestCommand(now.withDayOfWeek(1), now)
+    case "month" | "m" =>
+      val now = new DateTime
+      TimeOnDaysHarvestCommand(now.withDayOfMonth(1), now)
+    case "year" | "y" =>
+      val now = new DateTime
+      TimeOnDaysHarvestCommand(now.withDayOfMonth(1).withMonthOfYear(1), now)
+    case desc => throw new RuntimeException("Unable to parse timespan descriptor: [" + desc + "]")
   }
     
   def createStory: Parser[ApiCommand] = combinedParser("create", "c")("story") ^^ {
@@ -117,10 +124,15 @@ class CommandParser extends JavaTokenParsers with CombinedParsers {
 }
 object CommandParser extends CommandParser {
   def parse(content: String): ApiCommand = {
-    parseAll(command, content.trim) match {
-      case Success(res: ApiCommand, _) => res
-      case x: Failure => UnknownCommand(content)
-      case x: Error => throw new RuntimeException(x.toString)
+    try {
+      parseAll(command, content.trim) match {
+        case Success(res: ApiCommand, _) => res
+        case x: Failure => UnknownCommand(content)
+        case x: Error => throw new RuntimeException(x.toString)
+      }
+    } catch {
+      case e => println("Cought exception: " + e.getMessage)
+      NoOpCommand()
     }
   }
 }

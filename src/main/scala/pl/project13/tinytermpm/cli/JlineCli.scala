@@ -82,9 +82,11 @@ class JlineCli extends Cli {
     else askForSelectionOrQuit(message, acceptable)
   }
   
-  def askForBoolean(message: => Any, defaultValue: Boolean = false) =
-    SafeBoolean(askFor(message), defaultValue)
-  
+  def askForBoolean(message: => Any, defaultValue: Boolean = false) = defaultValue match {
+    case true => SafeBoolean(askFor(message+ " [Y/n] "), defaultValue)
+    case false => SafeBoolean(askFor(message+ " [y/N] "), defaultValue)
+  }
+
   def askOrQuit(message: => Any) = {
     val line = askFor(message)
     

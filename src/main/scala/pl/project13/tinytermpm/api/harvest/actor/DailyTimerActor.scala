@@ -9,10 +9,12 @@ import pl.project13.tinytermpm.util.{HarvestPreferences, ScalaJConversions, ApiP
 import pl.project13.tinytermpm.api.harvest.model.Daily
 import pl.project13.tinytermpm.cli.parsing.time.TimeSpan
 import org.joda.time.{Duration, DateTime}
+import akka.dispatch.{Future, Futures}
+import scala.collection.JavaConversions._
+
 
 class DailyTimerActor(config: HarvestPreferences) extends TypedActor with DailyTimerApi
-  with HttpDispatch
-  with ScalaJConversions {
+  with HttpDispatch {
 
   import dispatch._
 
@@ -24,11 +26,15 @@ class DailyTimerActor(config: HarvestPreferences) extends TypedActor with DailyT
     timeOnDay(new DateTime)
   }
 
-  def timeDuring(startDay: DateTime, days: Int): Double = {
-    val timesOnDays = for (dayNumber <- 0 until days)
-      yield timeOnDay(startDay.plusDays(dayNumber))
+  def timeDuring(startDay: DateTime, days: Int): TimeSpan = {
+    val timesOnDaysFutures = for (dayNumber <- 0 until days)
+      yield Future { timeOnDay(startDay.plusDays(dayNumber)) }
 
-    timesOnDays.foldLeft(0.0) { _ + _.toDouble }
+    val timesOnDays = Futures.sequence(timesOnDaysFutures.toList).get
+
+    val totalTime = timesOnDays.foldLeft(0.0) { _ + _.toDouble }
+
+    TimeSpan(totalTime)
   }
 
   def timeOnDay(day: DateTime): TimeSpan = {

@@ -1,6 +1,7 @@
 package pl.project13.tinytermpm.api
 
 import akka.actor.Actor
+import pl.project13.tinytermpm.util.Preferences
 
 
 trait HttpDispatch {
@@ -10,13 +11,16 @@ trait HttpDispatch {
 
   import dispatch._
 
-  val h = new Http {
+  val h = new Http with thread.Safety {
     override def make_logger =
-      new Logger {
-        def info(msg: String, items: Any*) {}
+      if(Preferences.LoggingOn)
+        super.make_logger
+      else
+        new Logger {
+          def info(msg: String, items: Any*) {}
 
-        def warn(msg: String, items: Any*) {}
-      }
+          def warn(msg: String, items: Any*) {}
+        }
   }
 
   override def postStop() {

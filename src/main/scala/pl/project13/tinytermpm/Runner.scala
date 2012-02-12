@@ -26,6 +26,9 @@ class Runner(cli: Cli) {
 
     tel("Saving settings... ")
     Preferences.save(serverUrl = url, apiKey = apiKey)
+
+    val seeLogs = askForBoolean("Do you want to see logs?", false)
+    Preferences.saveLogs(seeLogs)
     tell("Done!")
   }
 

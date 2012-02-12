@@ -21,13 +21,13 @@ import util.{ScalaJConversions, Constants, Preferences}
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
 import java.util.Collections
-import org.joda.time.DateTime
+import org.joda.time.{Days, Duration, DateTime}
 
 class Repl(cli: Cli) {
   implicit val _cli = cli // for fluent quittable usage
   import cli._
 
-  tell("Loading REPL...")
+  tel("Loading REPL...")
 
   var exitRepl = false
 
@@ -198,7 +198,7 @@ class Repl(cli: Cli) {
     ids.foreach { id =>
       tasks.detailsFor(id) match {
         case Some(task) =>
-          if(askForBoolean("""Delete task [%s] "%s" [y/N]?""".format(Safe(task.status.coloredName), task.name.bold), false)) {
+          if(askForBoolean("""Delete task [%s] "%s"?""".format(Safe(task.status.coloredName), task.name.bold), false)) {
             tasks.delete(task.id)
             tell("Fire and forget, deleting task...")
           }
@@ -216,7 +216,7 @@ class Repl(cli: Cli) {
   def doDeleteStory(id: Long) {
     stories.detailsFor(id) match { 
       case Some(story) =>
-        askForBoolean("""Delete user story: "%s"? [y/N]""".format(story.name), false) match {
+        askForBoolean("""Delete user story: "%s"?""".format(story.name), false) match {
           case false => return
           case _ =>
         }
@@ -232,6 +232,15 @@ class Repl(cli: Cli) {
     val time = dailyTimer.timeOnDay(day)
     
     tell("Harvest said you worked [%s] today.", time.toString.bold)
+  }
+  
+  def doHarvestTime(startDay: DateTime, endDay: DateTime) {
+    assert(startDay.isBefore(endDay), "Start day should be before end day... [start: %s, end: %s]".format(startDay, endDay))
+
+    val timeInWeek = dailyTimer.timeDuring(startDay, Days.daysBetween(startDay, endDay).getDays)
+    
+    tell("Harvest said you worked [%s].", timeInWeek.toString.bold)
+    tell("(Between %s and %s)", PrettyDate(startDay).withDayNamePrefix, PrettyDate(endDay).withDayNamePrefix)
   }
 
   def doExit() {
@@ -273,6 +282,7 @@ class Repl(cli: Cli) {
       case DeleteTasksCommand(ids) => doDeleteTasks(ids)
 
       case TimeOnDayHarvestCommand(day) => doHarvestTime(day)
+      case TimeOnDaysHarvestCommand(start, end) => doHarvestTime(start, end)
 
       case WhoAmICommand() => doWhoAmI()
 

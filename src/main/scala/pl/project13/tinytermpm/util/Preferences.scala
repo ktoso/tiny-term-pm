@@ -7,6 +7,7 @@ import java.util.Properties
 import java.io.{FileNotFoundException, FileOutputStream, FileInputStream}
 import com.github.tototoshi.base64.Base64
 import pl.project13.tinytermpm.api.tinypm.model.Project
+import pl.project13.tinytermpm.cli.util.SafeBoolean
 
 trait ApiPreferences {
   def ServerUrl: String
@@ -77,6 +78,14 @@ object Preferences extends Preferences {
     saveProps(props)
   }
 
+  def saveLogs(seeLogs: Boolean) {
+    val props = loadProps
+
+    props.put("logging", seeLogs.toString)
+
+    saveProps(props)
+  }
+
   private def saveProps(props: Properties) {
     using(new FileOutputStream(PreferencesFile)) { fos =>
       props.store(fos, "TinyTermPM preferences - "+Version)
@@ -94,6 +103,8 @@ object Preferences extends Preferences {
 
     properties
   }
+
+  lazy val LoggingOn = SafeBoolean(loadProps.getProperty("logging"))
 
   lazy val ServerUrl = loadProps.getProperty("server.url")
   lazy val ApiKey = new String(Base64.decode(loadProps.getProperty("api.key")).map(_.toChar).toArray)
